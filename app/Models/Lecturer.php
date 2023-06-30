@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lecturer extends Model
 {
@@ -14,6 +15,7 @@ class Lecturer extends Model
     public $timestamps = false;
     protected $primaryKey = 'id';
     protected $fillable = [
+        'code',
         'famMidName',
         'name',
         'gender',
@@ -23,4 +25,10 @@ class Lecturer extends Model
         'email',
         'onboardingDate'
     ];
+
+    public function classrooms(): HasMany
+    {
+        return $this->hasMany(Classroom::class);
+    }
+
 }

@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Import\StudentsImport;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
 class StudentController extends Controller
 {
@@ -37,15 +41,15 @@ class StudentController extends Controller
     {
         try {
             // Save lecturer
-            Student::create($request->all());
-
+            $student = Student::create($request->all());
+            $student->code = '1' . str_pad($student->id, 7, '0', STR_PAD_LEFT);
+            $student->save();
             // Return Json Response
             return response()->json([
                 'message' => "Lecturer successfully saved."
             ], 201);
         } catch (\Exception $e) {
             // Return Json Response
-            echo $e->getMessage();
             return response()->json([
                 'message' => "Something went really wrong!"
             ], 500);
@@ -57,7 +61,14 @@ class StudentController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // Find lecturer
+        $student = Student::where('code', $id)->first();
+
+        // Return Json Response
+        return response()->json(
+            $student,
+            200
+        );
     }
 
     /**
@@ -82,5 +93,39 @@ class StudentController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            HeadingRowFormatter::default('none');
+            Excel::import(new StudentsImport(), $request->file);
+            return response()->json([
+                'message' => 'Data was imported successfully'
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong!'
+            ], 400
+            );
+        }
+    }
+
+    public function getAllClassroom(string $id)
+    {
+        try {
+            // All classrooms
+            $classrooms = Student::where('code', $id)->first()->classrooms()->get();
+            // Return Json Response
+            return response()->json([
+                'classroom' => $classrooms
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400
+            );
+        }
     }
 }

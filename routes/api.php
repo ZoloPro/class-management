@@ -22,5 +22,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource('/lecturers', Api\LecturerController::class);
 Route::apiResource('/students', Api\StudentController::class);
 Route::apiResource('/modules', Api\ModuleController::class);
+Route::apiResource('/classroom', Api\ClassroomController::class);
+Route::apiResource('/mark', Api\ModuleController::class);
 
-Route::post('/import/lecturers', [Api\LecturerController::class, 'import']);
+Route::prefix('/import')->group(function () {
+    Route::post('/lecturers', [Api\LecturerController::class, 'import']);
+    Route::post('/students', [Api\StudentController::class, 'import']);
+});
+
+Route::get('/students/{id}/classroom', [Api\StudentController::class, 'getAllClassroom']);

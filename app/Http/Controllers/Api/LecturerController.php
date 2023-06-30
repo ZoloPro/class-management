@@ -33,15 +33,15 @@ class LecturerController extends Controller
     {
         try {
             // Save lecturer
-            Lecturer::create($request->all());
-
+            $lecturer = Lecturer::create($request->all());
+            $lecturer->code = '1' . str_pad($lecturer->id, 7, '0', STR_PAD_LEFT);
+            $lecturer->save();
             // Return Json Response
             return response()->json([
                 'message' => "Lecturer successfully saved."
             ], 201);
         } catch (\Exception $e) {
             // Return Json Response
-            echo $e->getMessage();
             return response()->json([
                 'message' => "Something went really wrong!"
             ], 500);
@@ -90,11 +90,9 @@ class LecturerController extends Controller
                 'message' => 'Data was imported successfully'
             ], 201);
         } catch (\Exception $e) {
-            echo $e;
             return response()->json([
                 'message' => 'Something went wrong!'
-            ], 400
-            );
+            ], 400);
         }
     }
 

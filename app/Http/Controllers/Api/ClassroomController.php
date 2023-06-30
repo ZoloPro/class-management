@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Classroom;
 use Illuminate\Http\Request;
 
 class ClassroomController extends Controller
@@ -12,7 +13,13 @@ class ClassroomController extends Controller
      */
     public function index()
     {
-        //
+        // All classrooms
+        $classrooms = Classroom::all();
+
+        // Return Json Response
+        return response()->json([
+            'classrooms' => $classrooms
+        ], 200);
     }
 
     /**
@@ -28,7 +35,20 @@ class ClassroomController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            // Save classroom
+            Classroom::create($request->all());
+
+            // Return Json Response
+            return response()->json([
+                'message' => "Classroom successfully saved."
+            ], 201);
+        } catch (\Exception $e) {
+            // Return Json Response
+            return response()->json([
+                'message' => "Something went really wrong!"
+            ], 500);
+        }
     }
 
     /**

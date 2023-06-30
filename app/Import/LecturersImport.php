@@ -17,7 +17,7 @@ class LecturersImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            Lecturer::create([
+            $lecturer = Lecturer::create([
                 'famMidName' => $row['Họ và lót'],
                 'name' => $row['Tên'],
                 'gender' => $row['Giới tính'],
@@ -26,6 +26,8 @@ class LecturersImport implements ToCollection, WithHeadingRow
                 'phone' => $row['Điện thoại'],
                 'onboardingDate' => date("Y-m-d", strtotime($row['Ngày vào làm'])),
             ]);
+            $lecturer->code = '1' . str_pad($lecturer->id, 7, '0', STR_PAD_LEFT);
+            $lecturer->save();
         }
     }
 }
