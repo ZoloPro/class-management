@@ -116,9 +116,21 @@ class StudentController extends Controller
         try {
             // All classrooms
             $classrooms = Student::where('code', $id)->first()->classrooms()->get();
+            $response = [];
+            foreach ($classrooms as $classroom) {
+                $lecturer = $classroom->lecturer;
+                $response[] = [
+                    'id' => $classroom['id'],
+                    'lecturer' => [
+                        'id' => $lecturer['id'],
+                        'fullname' => $lecturer['fullname']],
+                    'module' => $classroom->module,
+                ];
+            }
+
             // Return Json Response
             return response()->json([
-                'classroom' => $classrooms
+                'classroom' => $response,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
