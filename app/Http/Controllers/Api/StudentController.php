@@ -111,7 +111,7 @@ class StudentController extends Controller
         }
     }
 
-    public function getAllClassroom(string $id)
+    public function getAllClassrooms(string $id)
     {
         try {
             // All classrooms
@@ -122,7 +122,7 @@ class StudentController extends Controller
                 $response[] = [
                     'id' => $classroom['id'],
                     'lecturer' => [
-                        'id' => $lecturer['id'],
+                        'code' => $lecturer['code'],
                         'fullname' => $lecturer['fullname']],
                     'module' => $classroom->module,
                 ];

@@ -30,5 +30,4 @@ class Lecturer extends Model
     {
         return $this->hasMany(Classroom::class);
     }
-
 }

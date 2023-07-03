@@ -30,4 +30,10 @@ Route::prefix('/import')->group(function () {
     Route::post('/students', [Api\StudentController::class, 'import']);
 });
 
-Route::get('/students/{id}/classroom', [Api\StudentController::class, 'getAllClassroom']);
+Route::get('/students/{id}/classrooms', [Api\StudentController::class, 'getAllClassrooms']);
+
+
+Route::fallback(function(){
+    return response()->json([
+        'message' => 'Page Not Found'], 404);
+});
