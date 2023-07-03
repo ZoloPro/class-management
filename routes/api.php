@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api;
+use App\Http\Middleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +31,12 @@ Route::prefix('/import')->group(function () {
     Route::post('/students', [Api\StudentController::class, 'import']);
 });
 
-Route::get('/students/{id}/classrooms', [Api\StudentController::class, 'getAllClassrooms']);
+Route::get('/students/{id}/classrooms', [Api\StudentController::class, 'getAllClassrooms'])/*->middleware(Middleware\StudentAuthorized::class)*/;
+
+Route::post('/login/student', [Api\StudentAuth::class, 'login']);
+
+Route::put('/update', [Api\StudentController::class, 'resetAllPassword']);
+
 
 
 Route::fallback(function(){

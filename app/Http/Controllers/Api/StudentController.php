@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Import\StudentsImport;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
@@ -43,6 +44,7 @@ class StudentController extends Controller
             // Save lecturer
             $student = Student::create($request->all());
             $student->code = '1' . str_pad($student->id, 7, '0', STR_PAD_LEFT);
+            $student->password = Hash::make(substr($student->code, -4));
             $student->save();
             // Return Json Response
             return response()->json([
@@ -130,13 +132,35 @@ class StudentController extends Controller
 
             // Return Json Response
             return response()->json([
-                'classroom' => $response,
+                'status' => 1,
+                'data' => ['classroom' => $response],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
+                'status' => 0,
                 'error' => $e->getMessage(),
                 'message' => 'Something went wrong!',
             ], 400
+            );
+        }
+    }
+
+    function resetAllPassword()
+    {
+        try {
+            $students = Student::all();
+            foreach ($students as $student) {
+                $student->password = Hash::make('tksv' . substr($student->code, -4));
+                $student->save();
+            }
+            return response()->json(
+                ['message' => 'done'],
+                200
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                ['message' => $e->getMessage()],
+                400
             );
         }
     }
