@@ -31,7 +31,7 @@ Route::prefix('/import')->group(function () {
     Route::post('/students', [Api\StudentController::class, 'import']);
 });
 
-Route::get('/students/{id}/classrooms', [Api\StudentController::class, 'getAllClassrooms'])/*->middleware(Middleware\StudentAuthorized::class)*/;
+Route::get('/students/{id}/classrooms', [Api\StudentController::class, 'getAllClassrooms'])->middleware(Middleware\StudentAuthorized::class);
 
 Route::post('/login/student', [Api\StudentAuth::class, 'login']);
 
