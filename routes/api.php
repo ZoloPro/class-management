@@ -35,10 +35,6 @@ Route::get('/students/{id}/classrooms', [Api\StudentController::class, 'getAllCl
 
 Route::post('/login/student', [Api\StudentAuth::class, 'login']);
 
-Route::put('/update', [Api\StudentController::class, 'resetAllPassword']);
-
-
-
 Route::fallback(function(){
     return response()->json([
         'message' => 'Page Not Found'], 404);
