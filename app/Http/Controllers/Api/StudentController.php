@@ -117,7 +117,7 @@ class StudentController extends Controller
     {
         try {
             // All classrooms
-            $classrooms = Student::where('code', $id)->first()->classrooms()->get();
+            $classrooms = Student::where('code', $id)->first()->registeredClassrooms()->get();
             $response = [];
             foreach ($classrooms as $classroom) {
                 $lecturer = $classroom->lecturer;

@@ -82,4 +82,9 @@ class ClassroomController extends Controller
     {
         //
     }
+
+    public function generateAttendanceLink(string $id)
+    {
+        
+    }
 }

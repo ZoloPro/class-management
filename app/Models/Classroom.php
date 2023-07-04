@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Classroom extends Model
 {
@@ -29,6 +28,16 @@ class Classroom extends Model
             'classroomId',
             'studentId',
         )->as('registerClassroom');
+    }
+
+    public function attendedClassrooms(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Student::class,
+            'attendance',
+            'classroomId',
+            'studentId',
+        )->as('attendance');
     }
 
     public function lecturer(): BelongsTo
