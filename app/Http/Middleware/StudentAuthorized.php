@@ -21,8 +21,7 @@ class StudentAuthorized
             return \response()->json([
                 'status' => 0,
                 'message' => 'Unauthorized',
-            ], 400
-            );
+            ], 400);
         };
         return $next($request);
     }

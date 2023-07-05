@@ -35,6 +35,12 @@ Route::get('/students/{id}/classrooms', [Api\StudentController::class, 'getAllCl
 
 Route::post('/login/student', [Api\StudentAuth::class, 'login']);
 
+Route::get('/attendance/{id}', [Api\AttendanceController::class, 'generateAttendanceLink']);
+
+Route::post('/attendance', [Api\AttendanceController::class, 'attend']);
+
+Route::get('/me', [Api\StudentAuth::class, 'me']);
+
 Route::fallback(function(){
     return response()->json([
         'message' => 'Page Not Found'], 404);
