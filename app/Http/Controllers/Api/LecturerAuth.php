@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Models\Lecturer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
-class StudentAuth extends Controller
+class LecturerAuth extends Controller
 {
     /**
      * Create a new AuthController instance.
@@ -15,7 +18,7 @@ class StudentAuth extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:lecturerApi', ['except' => ['login']]);
     }
 
     /**
@@ -28,10 +31,10 @@ class StudentAuth extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('code', 'password');
+
         if ($token = $this->guard()->attempt($credentials)) {
             return $this->respondWithToken($token);
         }
-
         return response()->json([
             'status' => 0,
             'error' => 'Unauthorized'
@@ -94,6 +97,6 @@ class StudentAuth extends Controller
      */
     public function guard()
     {
-        return Auth::guard();
+        return Auth::guard('lecturerApi');
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Import\lecturersImport;
 use App\Models\Lecturer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
@@ -35,6 +36,7 @@ class LecturerController extends Controller
             // Save lecturer
             $lecturer = Lecturer::create($request->all());
             $lecturer->code = '1' . str_pad($lecturer->id, 7, '0', STR_PAD_LEFT);
+            $lecturer->password = Hash::make('tkgv' . substr($lecturer->code, -4));
             $lecturer->save();
             // Return Json Response
             return response()->json([
@@ -44,7 +46,7 @@ class LecturerController extends Controller
             // Return Json Response
             return response()->json([
                 'message' => "Something went really wrong!"
-            ], 500);
+            ], 400);
         }
     }
 
@@ -92,6 +94,34 @@ class LecturerController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Something went wrong!'
+            ], 400);
+        }
+    }
+
+    public function getClassroomsByLecturer(string $id)
+    {
+        try {
+            // All classrooms
+            $classrooms = Lecturer::where('code', $id)->first()->classrooms()->get();
+            $response = [];
+            foreach ($classrooms as $classroom) {
+                $lecturer = $classroom->lecturer;
+                $response[] = [
+                    'id' => $classroom['id'],
+                    'module' => $classroom->module,
+                ];
+            }
+
+            // Return Json Response
+            return response()->json([
+                'status' => 1,
+                'data' => ['classroom' => $response],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
             ], 400);
         }
     }

@@ -33,13 +33,21 @@ Route::prefix('/import')->group(function () {
 
 Route::get('/students/{id}/classrooms', [Api\StudentController::class, 'getAllClassrooms'])->middleware(Middleware\StudentAuthorized::class);
 
+Route::get('/lecturers/{id}/classrooms', [Api\LecturerController::class, 'getClassroomsByLecturer']);
+
 Route::post('/login/student', [Api\StudentAuth::class, 'login']);
+
+Route::post('/login/lecturer', [Api\LecturerAuth::class, 'login']);
+
+Route::post('/reset', [Api\LecturerAuth::class, 'resetAllPassword']);
 
 Route::get('/attendance/{id}', [Api\AttendanceController::class, 'generateAttendanceLink']);
 
 Route::post('/attendance', [Api\AttendanceController::class, 'attend']);
 
 Route::get('/me', [Api\StudentAuth::class, 'me']);
+
+Route::get('/classrooms/{id}/students', [Api\ClassroomController::class, 'getStudentsByClassroom']);
 
 Route::fallback(function(){
     return response()->json([

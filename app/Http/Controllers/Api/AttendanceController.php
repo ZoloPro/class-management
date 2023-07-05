@@ -9,6 +9,7 @@ use Complex\Exception;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Illuminate\Support\Facades\DB;
 use function PHPUnit\Framework\throwException;
 
 class AttendanceController extends Controller
@@ -39,12 +40,15 @@ class AttendanceController extends Controller
                 ], 400);
             }
             $decode = JWT::decode($token, new Key($key, 'HS256'));
-            $classroom = Classroom::find($decode->id);
-            $student = $classroom->registeredClassrooms()->where('code', $request->studentCode);
+            $classroom = Classroom::find($decode->classroomId);
+            $student = $classroom->registeredStudents()->where('code', $request->studentCode)->first();
             if(!$student) {
-                throwException(new Exception('No student information found in the classroom'));
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'No student found in class',
+                ], 400);
             }
-            $classroom->attendedClassrooms()->attach($student, ['date' => date('Y-m-d')]);
+            $classroom->attendedStudents()->attach($student, ['date' => date('Y-m-d')]);
             return response()->json([
                 'status' => 1,
                 'message' => 'Attended successfully',

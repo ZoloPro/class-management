@@ -30,7 +30,17 @@ class Classroom extends Model
         )->as('registerClassroom');
     }
 
-    public function attendedClassrooms(): BelongsToMany
+    public function registeredStudents(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Student::class,
+            'registerClassroom',
+            'classroomId',
+            'studentId',
+        )->as('registerClassroom');
+    }
+
+    public function attendedStudents(): BelongsToMany
     {
         return $this->belongsToMany(
             Student::class,

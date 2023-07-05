@@ -4,6 +4,7 @@ namespace App\Import;
 
 use App\Models\Lecturer;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
@@ -27,6 +28,7 @@ class LecturersImport implements ToCollection, WithHeadingRow
                 'onboardingDate' => date("Y-m-d", strtotime($row['Ngày vào làm'])),
             ]);
             $lecturer->code = '1' . str_pad($lecturer->id, 7, '0', STR_PAD_LEFT);
+            $lecturer->password = Hash::make('tkgv' . substr($lecturer->code, -4));
             $lecturer->save();
         }
     }

@@ -82,4 +82,32 @@ class ClassroomController extends Controller
     {
         //
     }
+
+    public function getStudentsByClassroom(string $id)
+    {
+        try {
+            // All classrooms
+            $students = Classroom::find($id)->registeredStudents()->get();
+            $response = [];
+            foreach ($students as $student) {
+                $response[] = [
+                    'code' => $student['code'],
+                    'fullname' => $student['fullname']
+                ];
+            }
+
+            // Return Json Response
+            return response()->json([
+                'status' => 1,
+                'data' => ['classroom' => $response],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400
+            );
+        }
+    }
 }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Import\StudentsImport;
 use App\Models\Student;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
@@ -140,8 +139,7 @@ class StudentController extends Controller
                 'status' => 0,
                 'error' => $e->getMessage(),
                 'message' => 'Something went wrong!',
-            ], 400
-            );
+            ], 400 );
         }
     }
 
