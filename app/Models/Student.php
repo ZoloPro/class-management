@@ -51,6 +51,16 @@ class Student extends Authenticatable implements JWTSubject
         )->as('attendance');
     }
 
+    public function hasMarks(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Classroom::class,
+            'mark',
+            'studentId',
+            'classroomId'
+        )->as('mark')->withPivot('mark');
+    }
+
     // Rest omitted for brevity
 
     /**

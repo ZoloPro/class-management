@@ -53,11 +53,13 @@ class StudentAuth extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout()
+    public function logout(Request $request)
     {
         $this->guard()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json([
+            'status' => 1,
+            'message' => 'Successfully logged out'],200);
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Import\StudentsImport;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
@@ -139,7 +140,7 @@ class StudentController extends Controller
                 'status' => 0,
                 'error' => $e->getMessage(),
                 'message' => 'Something went wrong!',
-            ], 400 );
+            ], 400);
         }
     }
 
@@ -161,5 +162,77 @@ class StudentController extends Controller
                 400
             );
         }
+    }
+
+    //Lấy tất cả danh sách lớp học của sinh viên đang đăng nhập
+    public function getAllClassroomsByLoggedStudent()
+    {
+        try {
+            $user = Auth::user();
+            $classrooms = $user->registeredClassrooms()->get();
+            $response = [];
+            foreach ($classrooms as $classroom) {
+                $lecturer = $classroom->lecturer()->get(['code', 'fullname']);
+                $response[] = [
+                    'id' => $classroom['id'],
+                    'lecturer' => $lecturer,
+                    'module' => $classroom->module,
+                ];
+            }
+            return response()->json([
+                'status' => 1,
+                'message' => 'Get data successfully',
+                'data' => ['classrooms' => $response],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400);
+        }
+    }
+
+    //Lấy thông tin chi tiết lớp học của sinh viên đang đăng nhập
+    public function getClassroomDetail(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $classroom = $user->registeredClassrooms()->find($request->classroomId);
+            if(!$classroom) {
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'classroom information not found!',
+                ], 400);
+            }
+            $mark = $user->hasMarks()->find($request->classroomId)->mark->mark;
+            $students = $classroom->registeredStudents()->get();
+            $students = $students->map(function ($student) {
+                return $student->only(['code', 'famMidName', 'name', 'gender']);
+            });
+            return response()->json([
+                'status' => 1,
+                'message' => 'Get data successfully',
+                'data' => [
+                    'id' => $classroom->id,
+                    'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
+                    'module' => $classroom->module,
+                    'mark' => $mark,
+                    'students' => $students,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400);
+        }
+    }
+
+    //Lấy tất cả điểm của sinh viên đăng đăng nhập
+    public function getMarksByLoggedStudent()
+    {
+
     }
 }
