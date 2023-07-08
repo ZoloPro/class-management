@@ -33,13 +33,26 @@ Route::prefix('/import')->group(function () {
 
 Route::prefix('/student')->group(function () {
     Route::post('/login', [Api\StudentAuth::class, 'login']);
-    Route::get('/logout', [Api\StudentAuth::class, 'logout']);
 
     Route::middleware('auth')->group(function () {
+        Route::get('/logout', [Api\StudentAuth::class, 'logout']);
         Route::get('/me', [Api\StudentAuth::class, 'me']);
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
         Route::get('/classrooms/{classroomId}', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/mark', [Api\StudentController::class, 'getMarksByLoggedStudent']);
+    });
+});
+
+Route::prefix('/lecturer')->group(function () {
+    Route::post('/login', [Api\LecturerAuth::class, 'login']);
+
+    Route::middleware('auth:lecturerApi')->group(function () {
+        Route::get('/logout', [Api\LecturerAuth::class, 'logout']);
+
+        Route::get('/me', [Api\LecturerAuth::class, 'me']);
+        Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
+        Route::get('/classrooms/{classroomId}/mark', [Api\StudentController::class, 'getClassroomDetail']);
+        Route::get('/classrooms/{classroomId}/attendance', [Api\StudentController::class, 'getMarksByLoggedStudent']);
     });
 });
 

@@ -168,8 +168,8 @@ class StudentController extends Controller
     public function getAllClassroomsByLoggedStudent()
     {
         try {
-            $user = Auth::user();
-            $classrooms = $user->registeredClassrooms()->get();
+            $student = Auth::user();
+            $classrooms = $student->registeredClassrooms()->get();
             $response = [];
             foreach ($classrooms as $classroom) {
                 $lecturer = $classroom->lecturer()->get(['code', 'fullname']);
@@ -197,15 +197,15 @@ class StudentController extends Controller
     public function getClassroomDetail(Request $request)
     {
         try {
-            $user = Auth::user();
-            $classroom = $user->registeredClassrooms()->find($request->classroomId);
-            if(!$classroom) {
+            $student = Auth::user();
+            $classroom = $student->registeredClassrooms()->find($request->classroomId);
+            if (!$classroom) {
                 return response()->json([
                     'status' => 0,
                     'message' => 'classroom information not found!',
                 ], 400);
             }
-            $mark = $user->hasMarks()->find($request->classroomId)->mark->mark;
+            $mark = $student->hasMarks()->find($request->classroomId)->mark->mark;
             $students = $classroom->registeredStudents()->get();
             $students = $students->map(function ($student) {
                 return $student->only(['code', 'famMidName', 'name', 'gender']);
@@ -233,6 +233,28 @@ class StudentController extends Controller
     //Lấy tất cả điểm của sinh viên đăng đăng nhập
     public function getMarksByLoggedStudent()
     {
+        try {
+            $student = Auth::user();
+            $marks = $student->hasMarks;
+            $marks = $marks->map(function ($mark) {
+                return [
+                    'moduleId' => $mark->module->id,
+                    'moduleName' => $mark->module->moduleName,
+                    'mark' => $mark->mark->mark
 
+                ];
+            });
+            return response()->json([
+                'status' => 1,
+                'message' => 'Get data successfully',
+                'data' => ['marks' => $marks],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400);
+        }
     }
 }
