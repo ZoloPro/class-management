@@ -83,6 +83,7 @@ class LecturerAuth extends Controller
     protected function respondWithToken($token)
     {
         return response()->json([
+            'user' => $this->guard()->user(),
             'status' => 1,
             'access_token' => $token,
             'token_type' => 'bearer',

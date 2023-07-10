@@ -50,9 +50,9 @@ Route::prefix('/lecturer')->group(function () {
         Route::get('/logout', [Api\LecturerAuth::class, 'logout']);
 
         Route::get('/me', [Api\LecturerAuth::class, 'me']);
-        Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
-        Route::get('/classrooms/{classroomId}/mark', [Api\StudentController::class, 'getClassroomDetail']);
-        Route::get('/classrooms/{classroomId}/attendance', [Api\StudentController::class, 'getMarksByLoggedStudent']);
+        Route::get('/classrooms', [Api\LecturerController::class, 'getClassroomsByLoggedLecturer']);
+        Route::get('/classrooms/{classroomId}/mark', [Api\LecturerController::class, 'getMarksByClassroom']);
+//        Route::get('/classrooms/{classroomId}/attendance', [Api\StudentController::class, 'getMarksByLoggedStudent']);
     });
 });
 

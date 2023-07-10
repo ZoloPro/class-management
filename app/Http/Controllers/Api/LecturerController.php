@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Import\lecturersImport;
 use App\Models\Lecturer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
@@ -126,5 +127,60 @@ class LecturerController extends Controller
         }
     }
 
+    public function getClassroomsByLoggedLecturer()
+    {
+        try {
+            $lecturer = Auth::user();
+            $classrooms = $lecturer->classrooms;
+            $classrooms = $classrooms->map(function ($classroom) {
+                    return [
+                        'id' => $classroom->id,
+                        'moduleId' => $classroom->moduleId,
+                        'moduleName' => $classroom->module->moduleName,
+                    ];
+                });
+            return response()->json([
+                'status' => 1,
+                'classrooms' => $classrooms,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400);
+        }
+    }
+
+    public function getMarksByClassroom(Request $request)
+    {
+        try {
+            $lecturer = Auth::user();
+            $classroom = $lecturer->classrooms()->find($request->classroomId);
+            $studetns = $classroom->registeredStudents;
+            $markList = $studetns->map(function ($student) use ($request) {
+                $mark = $student->hasMarks()->find($request->classroomId);
+                $studentMark = $mark ? $mark->mark->mark : null;
+                return [
+                    'code' => $student->code,
+                    'famMidName' => $student->famMidName,
+                    'name' => $student->name,
+                    'gender' => $student->gender,
+                    'mark' => $studentMark,
+                ];
+            });
+            return response()->json([
+                'status' => 1,
+                'message' => 'Get data successfully',
+                'data' => ['markList' => $markList],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400);
+        }
+    }
 
 }

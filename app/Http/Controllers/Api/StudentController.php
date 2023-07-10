@@ -133,7 +133,7 @@ class StudentController extends Controller
             // Return Json Response
             return response()->json([
                 'status' => 1,
-                'data' => ['classroom' => $response],
+                'classroom' => $response,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -169,10 +169,10 @@ class StudentController extends Controller
     {
         try {
             $student = Auth::user();
-            $classrooms = $student->registeredClassrooms()->get();
+            $classrooms = $student->registeredClassrooms;
             $response = [];
             foreach ($classrooms as $classroom) {
-                $lecturer = $classroom->lecturer()->get(['code', 'fullname']);
+                $lecturer = $classroom->lecturer->only(['code', 'fullname']);
                 $response[] = [
                     'id' => $classroom['id'],
                     'lecturer' => $lecturer,
@@ -182,7 +182,7 @@ class StudentController extends Controller
             return response()->json([
                 'status' => 1,
                 'message' => 'Get data successfully',
-                'data' => ['classrooms' => $response],
+                'classrooms' => $response,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -213,13 +213,11 @@ class StudentController extends Controller
             return response()->json([
                 'status' => 1,
                 'message' => 'Get data successfully',
-                'data' => [
-                    'id' => $classroom->id,
-                    'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
-                    'module' => $classroom->module,
-                    'mark' => $mark,
-                    'students' => $students,
-                ],
+                'id' => $classroom->id,
+                'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
+                'module' => $classroom->module,
+                'mark' => $mark,
+                'students' => $students,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -241,13 +239,12 @@ class StudentController extends Controller
                     'moduleId' => $mark->module->id,
                     'moduleName' => $mark->module->moduleName,
                     'mark' => $mark->mark->mark
-
                 ];
             });
             return response()->json([
                 'status' => 1,
                 'message' => 'Get data successfully',
-                'data' => ['marks' => $marks],
+                'marks' => $marks,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
