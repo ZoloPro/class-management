@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Module extends Model
+class Term extends Model
 {
     use HasFactory;
 
-    protected $table = 'module';
+    protected $table = 'term';
 
     public $timestamps = false;
 
     protected $fillable = [
-        'moduleName',
+        'termName',
         'credit',
     ];
 }

@@ -3,22 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Module;
+use App\Models\Term;
 use Illuminate\Http\Request;
 
-class ModuleController extends Controller
+class TermController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        // All modules
-        $modules = Module::all();
+        // All terms
+        $terms = Term::all();
 
         // Return Json Response
         return response()->json([
-            'moules' => $modules
+            'terms' => $terms
         ], 200);
     }
 
@@ -36,12 +36,12 @@ class ModuleController extends Controller
     public function store(Request $request)
     {
         try {
-            // Save module
-            Module::create($request->all());
+            // Save term
+            Term::create($request->all());
 
             // Return Json Response
             return response()->json([
-                'message' => "Module successfully saved."
+                'message' => "Term successfully saved."
             ], 201);
         } catch (\Exception $e) {
             // Return Json Response
@@ -80,6 +80,20 @@ class ModuleController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            Term::destroy($id);
+            return response()->json([
+                'status' => 0,
+                'message' => 'Deleted successfully',
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400);
+        }
+
     }
 }

@@ -46,6 +46,7 @@ class LecturerController extends Controller
         } catch (\Exception $e) {
             // Return Json Response
             return response()->json([
+                'error' => $e->getMessage(),
                 'message' => "Something went really wrong!"
             ], 400);
         }
@@ -78,7 +79,19 @@ class LecturerController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            Lecturer::destroy($id);
+            return response()->json([
+                'status' => 0,
+                'message' => 'Deleted successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400);
+        }
     }
 
     /**
@@ -94,6 +107,8 @@ class LecturerController extends Controller
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
                 'message' => 'Something went wrong!'
             ], 400);
         }
@@ -109,7 +124,7 @@ class LecturerController extends Controller
                 $lecturer = $classroom->lecturer;
                 $response[] = [
                     'id' => $classroom['id'],
-                    'module' => $classroom->module,
+                    'term' => $classroom->term,
                 ];
             }
 
@@ -133,12 +148,12 @@ class LecturerController extends Controller
             $lecturer = Auth::user();
             $classrooms = $lecturer->classrooms;
             $classrooms = $classrooms->map(function ($classroom) {
-                    return [
-                        'id' => $classroom->id,
-                        'moduleId' => $classroom->moduleId,
-                        'moduleName' => $classroom->module->moduleName,
-                    ];
-                });
+                return [
+                    'id' => $classroom->id,
+                    'termId' => $classroom->termId,
+                    'termName' => $classroom->term->termName,
+                ];
+            });
             return response()->json([
                 'status' => 1,
                 'classrooms' => $classrooms,
@@ -172,7 +187,7 @@ class LecturerController extends Controller
             return response()->json([
                 'status' => 1,
                 'message' => 'Get data successfully',
-                'data' => ['markList' => $markList],
+                'markList' => $markList,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

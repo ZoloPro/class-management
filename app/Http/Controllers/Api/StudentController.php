@@ -126,7 +126,7 @@ class StudentController extends Controller
                     'lecturer' => [
                         'code' => $lecturer['code'],
                         'fullname' => $lecturer['fullname']],
-                    'module' => $classroom->module,
+                    'term' => $classroom->term,
                 ];
             }
 
@@ -176,7 +176,7 @@ class StudentController extends Controller
                 $response[] = [
                     'id' => $classroom['id'],
                     'lecturer' => $lecturer,
-                    'module' => $classroom->module,
+                    'term' => $classroom->term,
                 ];
             }
             return response()->json([
@@ -215,7 +215,7 @@ class StudentController extends Controller
                 'message' => 'Get data successfully',
                 'id' => $classroom->id,
                 'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
-                'module' => $classroom->module,
+                'term' => $classroom->term,
                 'mark' => $mark,
                 'students' => $students,
             ]);
@@ -236,8 +236,8 @@ class StudentController extends Controller
             $marks = $student->hasMarks;
             $marks = $marks->map(function ($mark) {
                 return [
-                    'moduleId' => $mark->module->id,
-                    'moduleName' => $mark->module->moduleName,
+                    'termId' => $mark->term->id,
+                    'termName' => $mark->term->termName,
                     'mark' => $mark->mark->mark
                 ];
             });

@@ -25,7 +25,6 @@ class LecturersImport implements ToCollection, WithHeadingRow
                 'birthdate' => date("Y-m-d", strtotime($row['Ngày sinh'])),
                 'email' => $row['Email'],
                 'phone' => $row['Điện thoại'],
-                'onboardingDate' => date("Y-m-d", strtotime($row['Ngày vào làm'])),
             ]);
             $lecturer->code = '1' . str_pad($lecturer->id, 7, '0', STR_PAD_LEFT);
             $lecturer->password = Hash::make('tkgv' . substr($lecturer->code, -4));

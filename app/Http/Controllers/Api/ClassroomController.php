@@ -15,7 +15,13 @@ class ClassroomController extends Controller
     {
         // All classrooms
         $classrooms = Classroom::all();
-
+        $classrooms = $classrooms->map(function ($classroom) {
+            return [
+                'id' => $classroom->id,
+                'term' => $classroom->term,
+                'lecturer' => $classroom->lecturer,
+            ];
+        });
         // Return Json Response
         return response()->json([
             'classrooms' => $classrooms

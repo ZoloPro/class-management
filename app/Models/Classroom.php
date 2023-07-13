@@ -16,7 +16,7 @@ class Classroom extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'moduleCode',
+        'termCode',
         'lectureCode',
     ];
 
@@ -65,8 +65,8 @@ class Classroom extends Model
         return $this->BelongsTo(Lecturer::class, 'lecturerId');
     }
 
-    public function module(): BelongsTo
+    public function term(): BelongsTo
     {
-        return $this->BelongsTo(Module::class, 'moduleId');
+        return $this->BelongsTo(Term::class, 'termId');
     }
 }
