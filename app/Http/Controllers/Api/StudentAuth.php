@@ -60,7 +60,12 @@ class StudentAuth extends Controller
      */
     public function me()
     {
-        return response()->json($this->guard()->user());
+        if ($this->guard()->user()) {
+            return response()->json([
+                'success' => 1,
+                'message' => 'Get data of logged in account successfully',
+                'data' => $this->guard()->user()]);
+        }
     }
 
     /**

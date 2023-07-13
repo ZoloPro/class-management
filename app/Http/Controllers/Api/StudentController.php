@@ -180,15 +180,15 @@ class StudentController extends Controller
                 ];
             }
             return response()->json([
-                'status' => 1,
-                'message' => 'Get data successfully',
-                'classrooms' => $response,
+                'success' => 1,
+                'message' => 'Get all classrooms by logged in student successfully',
+                'data' => ['classrooms' => $response],
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
+                'success' => 0,
                 'message' => 'Something went wrong!',
+                'error' => $e->getMessage(),
             ], 400);
         }
     }
@@ -201,8 +201,9 @@ class StudentController extends Controller
             $classroom = $student->registeredClassrooms()->find($request->classroomId);
             if (!$classroom) {
                 return response()->json([
-                    'status' => 0,
-                    'message' => 'classroom information not found!',
+                    'success' => 0,
+                    'message' => 'classroom information not found',
+                    'data' => []
                 ], 400);
             }
             $mark = $student->hasMarks()->find($request->classroomId)->mark->mark;
@@ -211,17 +212,19 @@ class StudentController extends Controller
                 return $student->only(['code', 'famMidName', 'name', 'gender']);
             });
             return response()->json([
-                'status' => 1,
-                'message' => 'Get data successfully',
-                'id' => $classroom->id,
-                'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
-                'term' => $classroom->term,
-                'mark' => $mark,
-                'students' => $students,
+                'success' => 1,
+                'message' => 'Get classroom detail successfully',
+                'data' => [
+                    'id' => $classroom->id,
+                    'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
+                    'term' => $classroom->term,
+                    'mark' => $mark,
+                    'students' => $students,
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
+                'success' => 0,
                 'error' => $e->getMessage(),
                 'message' => 'Something went wrong!',
             ], 400);
@@ -242,15 +245,15 @@ class StudentController extends Controller
                 ];
             });
             return response()->json([
-                'status' => 1,
+                'success' => 1,
                 'message' => 'Get data successfully',
                 'marks' => $marks,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
+                'success' => 0,
                 'message' => 'Something went wrong!',
+                'error' => $e->getMessage(),
             ], 400);
         }
     }
