@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class StudentAuth extends Controller
 {
@@ -27,15 +28,29 @@ class StudentAuth extends Controller
      */
     public function login(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|string|min:8|max:8|exists:student,code',
+            'password' => 'required|string'
+        ], [
+            'code.exists' => 'Student code does not exist'
+        ]);
+
+        if ($validator->stopOnFirstFailure()->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => $validator->errors()->first(),
+                'data' => []], 400);
+        }
+
         $credentials = $request->only('code', 'password');
         if ($token = $this->guard()->attempt($credentials)) {
             return $this->respondWithToken($token);
         }
 
         return response()->json([
-            'status' => 0,
-            'error' => 'Unauthorized'
-        ], 401);
+            'success' => 0,
+            'message' => 'Password does not match',
+            'data' => []], 401);
     }
 
     /**
@@ -58,8 +73,9 @@ class StudentAuth extends Controller
         $this->guard()->logout();
 
         return response()->json([
-            'status' => 1,
-            'message' => 'Successfully logged out'],200);
+            'success' => 1,
+            'message' => 'Successfully logged out',
+            'data' => []], 200);
     }
 
     /**
@@ -82,10 +98,12 @@ class StudentAuth extends Controller
     protected function respondWithToken($token)
     {
         return response()->json([
-            'status' => 1,
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => $this->guard()->factory()->getTTL() * 60
+            'success' => 1,
+            'message' => 'Logged in successfully',
+            'data' => [
+                'user' => $this->guard()->user(),
+                'access_token' => $token
+            ],
         ]);
     }
 

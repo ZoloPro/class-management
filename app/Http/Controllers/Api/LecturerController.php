@@ -71,7 +71,20 @@ class LecturerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $lecturer =  Lecturer::find($id);
+            $lecturer
+            return response()->json([
+                'status' => 0,
+                'message' => 'Deleted successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 0,
+                'error' => $e->getMessage(),
+                'message' => 'Something went wrong!',
+            ], 400);
+        }
     }
 
     /**

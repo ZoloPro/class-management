@@ -35,6 +35,7 @@ Route::prefix('/admin')->group(function () {
     });
     Route::get('/lecturers', [Api\LecturerController::class, 'index']);
     Route::post('/lecturers', [Api\LecturerController::class, 'store']);
+    Route::put('/lecturers/{id}', [Api\LecturerController::class, 'update']);
     Route::delete('/lecturers/{id}', [Api\LecturerController::class, 'destroy']);
     Route::post('/import/lecturer', [Api\LecturerController::class, 'import']);
     Route::get('/terms', [Api\TermController::class, 'index']);
