@@ -24,7 +24,9 @@ class LecturerController extends Controller
 
         // Return Json Response
         return response()->json([
-            'lecturers' => $lecturers
+            'success' => 1,
+            'message' => 'Get data successfully',
+            'data' => ['lecturers' => $lecturers],
         ], 200);
     }
 
@@ -41,13 +43,18 @@ class LecturerController extends Controller
             $lecturer->save();
             // Return Json Response
             return response()->json([
-                'message' => "Lecturer successfully saved."
+                'success' => 1,
+                'message' => "Lecturer successfully saved.",
+                'data' => [
+                    'lecturer' => $lecturer
+                ]
             ], 201);
         } catch (\Exception $e) {
             // Return Json Response
             return response()->json([
+                'success' => 0,
+                'message' => "Something went really wrong!",
                 'error' => $e->getMessage(),
-                'message' => "Something went really wrong!"
             ], 400);
         }
     }
@@ -72,17 +79,21 @@ class LecturerController extends Controller
     public function update(Request $request, string $id)
     {
         try {
-            $lecturer =  Lecturer::find($id);
-            $lecturer
+            $lecturer = Lecturer::findOrFail($id);
+            $data = $request->all();
+            $lecturer->update($data);
+
             return response()->json([
-                'status' => 0,
-                'message' => 'Deleted successfully',
+                'success' => 1,
+                'message' => 'Update successfully',
+                'data' => $lecturer,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
+                'success' => 0,
                 'message' => 'Something went wrong!',
+                'error' => $e->getMessage(),
+                'data' => [],
             ], 400);
         }
     }

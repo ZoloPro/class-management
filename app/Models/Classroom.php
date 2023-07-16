@@ -12,12 +12,12 @@ class Classroom extends Model
     use HasFactory;
 
     protected $table = 'classroom';
-
+    public $timestamps = false;
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'termCode',
-        'lectureCode',
+        'termId',
+        'lecturerId',
     ];
 
     public function students(): BelongsToMany

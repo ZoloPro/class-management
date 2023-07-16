@@ -18,8 +18,9 @@ class TermController extends Controller
 
         // Return Json Response
         return response()->json([
-            'terms' => $terms
-        ], 200);
+            'success' => 0,
+            'message' => 'Get data successfully',
+            'data' => ['terms' => $terms]], 200);
     }
 
     /**
@@ -72,7 +73,24 @@ class TermController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            // Update term
+            $term = Term::find($id)->update($request->all());
+
+            // Return Json Response
+            return response()->json([
+                'success' => 1,
+                'message' => "Term successfully updated",
+                'data' => ['term' => $term]
+            ], 200);
+        } catch (\Exception $e) {
+            // Return Json Response
+            return response()->json([
+                'success' => 0,
+                'message' => "Something went really wrong!",
+                'error' => $e->getMessage(),
+            ], 400);
+        }
     }
 
     /**
@@ -83,15 +101,16 @@ class TermController extends Controller
         try {
             Term::destroy($id);
             return response()->json([
-                'status' => 0,
+                'success' => 1,
                 'message' => 'Deleted successfully',
+                'data ' => []
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
+                'success' => 0,
                 'message' => 'Something went wrong!',
+                'error' => $e->getMessage(),
             ], 400);
         }
 

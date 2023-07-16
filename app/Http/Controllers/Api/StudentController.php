@@ -23,8 +23,9 @@ class StudentController extends Controller
 
         // Return Json Response
         return response()->json([
-            'students' => $studens
-        ], 200);
+            'success' => 1,
+            'message' => 'Get data successfully',
+            'data' => ['students' => $studens]], 200);
     }
 
     /**
@@ -48,13 +49,17 @@ class StudentController extends Controller
             $student->save();
             // Return Json Response
             return response()->json([
-                'message' => "Lecturer successfully saved."
+                'success' => 1,
+                'message' => "Lecturer successfully saved",
+                'data' => ['student' => $student]
             ], 201);
         } catch (\Exception $e) {
             // Return Json Response
             return response()->json([
-                'message' => "Something went really wrong!"
-            ], 500);
+                'success' => 0,
+                'message' => "Something went really wrong!",
+                'error' => $e->getMessage(),
+                'data' => []], 400);
         }
     }
 
@@ -86,7 +91,24 @@ class StudentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $student = Student::findOrFail($id);
+            $data = $request->all();
+            $student->update($data);
+
+            return response()->json([
+                'success' => 1,
+                'message' => 'Update successfully',
+                'data' => $student,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Something went wrong!',
+                'error' => $e->getMessage(),
+                'data' => [],
+            ], 400);
+        }
     }
 
     /**
@@ -94,7 +116,21 @@ class StudentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            Student::destroy($id);
+            return response()->json([
+                'success' => 1,
+                'message' => 'Deleted successfully',
+                'data' => [],
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Something went wrong!',
+                'error' => $e->getMessage(),
+                'data' => [],
+            ], 400);
+        }
     }
 
     public function import(Request $request)

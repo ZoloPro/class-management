@@ -24,8 +24,9 @@ class ClassroomController extends Controller
         });
         // Return Json Response
         return response()->json([
-            'classrooms' => $classrooms
-        ], 200);
+            'success' => 1,
+            'message' => 'Get data successfully',
+            'data' => ['classrooms' => $classrooms]], 200);
     }
 
     /**
@@ -43,17 +44,21 @@ class ClassroomController extends Controller
     {
         try {
             // Save classroom
-            Classroom::create($request->all());
+            $classroom = Classroom::create($request->all());
 
             // Return Json Response
             return response()->json([
-                'message' => "Classroom successfully saved."
+                'success' => 1,
+                'message' => "Classroom created successfully.",
+                'data' => ['classroom' => $classroom],
             ], 201);
         } catch (\Exception $e) {
             // Return Json Response
             return response()->json([
-                'message' => "Something went really wrong!"
-            ], 500);
+                'success' => 0,
+                'message' => "Something went really wrong!",
+                'error' => $e->getMessage(),
+            ], 400);
         }
     }
 
@@ -86,34 +91,60 @@ class ClassroomController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            Classroom::destroy($id);
+            return response()->json([
+                'success' => 1,
+                'message' => `Deleted classroom with id ${id} successfully`,
+                'data' => []], 200);
+        } catch (\Exception $e) {
+            if ($e->getCode() == 23000) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => 'Integrity constraint violation',
+                    'data' => []], 400);
+            }
+            return response()->json([
+                'success' => 0,
+                'message' => 'Something went wrong!',
+                'error' => $e->getCode(),
+            ], 400
+            );
+        }
     }
 
     public function getStudentsByClassroom(string $id)
     {
         try {
-            // All classrooms
-            $students = Classroom::find($id)->registeredStudents()->get();
-            $response = [];
-            foreach ($students as $student) {
-                $response[] = [
-                    'code' => $student['code'],
-                    'fullname' => $student['fullname']
-                ];
+            $classroom = Classroom::find($id);
+            if (!$classroom) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => 'Classroom information not found',
+                    'data' => []
+                ], 400);
             }
+            $lecturer = $classroom->lecturer->only(['code', 'fullname']);
+            $students = $classroom->registeredStudents()->get();
+            $students = $students->map(function ($student) {
+                return $student->only(['code', 'famMidName', 'name', 'gender']);
+            });
 
             // Return Json Response
             return response()->json([
-                'status' => 1,
-                'data' => ['classroom' => $response],
-            ], 200);
+                'success' => 1,
+                'message' => 'Get data successfully',
+                'data' => ['classroom' => [
+                    'lecture' => $lecturer,
+                    'term' => $classroom->term,
+                    'students' => $students
+                ]]], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
+                'success' => 0,
                 'message' => 'Something went wrong!',
-            ], 400
-            );
+                'error' => $e->getMessage(),
+            ], 400);
         }
     }
 }

@@ -27,7 +27,7 @@ class StudentsImport implements ToCollection, WithHeadingRow
                 'phone' => $row['Điện thoại'],
                 'enrollmentDate' => date("Y-m-d", strtotime($row['Ngày nhập học'])),
             ]);
-            $student->code = '1' . str_pad($student->id, 7, '0', STR_PAD_LEFT);
+            $student->code = '2' . str_pad($student->id, 7, '0', STR_PAD_LEFT);
             $student->password = Hash::make(substr($student->code, -4));
             $student->save();
         }
