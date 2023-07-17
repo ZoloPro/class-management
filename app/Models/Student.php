@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use Laravel\Sanctum\HasApiTokens;
 
-class Student extends Authenticatable implements JWTSubject
+class Student extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, hasApiTokens;
 
     protected $table = 'student';
     public $timestamps = false;
@@ -59,27 +59,5 @@ class Student extends Authenticatable implements JWTSubject
             'studentId',
             'classroomId'
         )->as('mark')->withPivot('mark');
-    }
-
-    // Rest omitted for brevity
-
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
-    {
-        return [];
     }
 }

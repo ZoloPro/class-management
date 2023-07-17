@@ -27,7 +27,7 @@ Route::apiResource('/classroom', Api\ClassroomController::class);
 Route::apiResource('/mark', Api\TermController::class);
 */
 Route::prefix('/admin')->group(function () {
-    Route::post('/login', [Api\StudentAuth::class, 'login']);
+    Route::post('/login', [Api\AdminAuth::class, 'login']);
 
     Route::prefix('/import')->group(function () {
         Route::post('/lecturers', [Api\LecturerController::class, 'import']);
@@ -62,7 +62,7 @@ Route::prefix('/admin')->group(function () {
 Route::prefix('/student')->group(function () {
     Route::post('/login', [Api\StudentAuth::class, 'login']);
 
-    Route::middleware('auth')->group(function () {
+    Route::middleware('auth:studentToken')->group(function () {
         Route::get('/logout', [Api\StudentAuth::class, 'logout']);
         Route::get('/me', [Api\StudentAuth::class, 'me']);
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
@@ -74,7 +74,7 @@ Route::prefix('/student')->group(function () {
 Route::prefix('/lecturer')->group(function () {
     Route::post('/login', [Api\LecturerAuth::class, 'login']);
 
-    Route::middleware('auth:lecturerApi')->group(function () {
+    Route::middleware('auth:lecturerToken')->group(function () {
         Route::get('/logout', [Api\LecturerAuth::class, 'logout']);
 
         Route::get('/me', [Api\LecturerAuth::class, 'me']);

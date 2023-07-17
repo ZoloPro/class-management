@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class LecturerAuth extends Controller
+class AdminAuth extends Controller
 {
     /**
      * Get a JWT token via given credentials.
@@ -19,10 +19,10 @@ class LecturerAuth extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code' => 'required|string|min:8|max:8|exists:lecturer,code',
+            'code' => 'required|string|min:8|max:8|exists:admin,code',
             'password' => 'required|string'
         ], [
-            'code.exists' => 'Lecturer code does not exist'
+            'code.exists' => 'Admin code does not exist'
         ]);
 
         if ($validator->stopOnFirstFailure()->fails()) {
@@ -33,8 +33,8 @@ class LecturerAuth extends Controller
         }
 
         $credentials = $request->only('code', 'password');
-        if (Auth::guard('lecturer')->attempt($credentials)) {
-            $user = Auth::guard('lecturer')->user();
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $user = Auth::guard('admin')->user();
             $user->tokens()->delete();
             $token = $user->createToken('API Token')->plainTextToken;
 
@@ -47,6 +47,10 @@ class LecturerAuth extends Controller
                 ],
             ]);
         }
+        return response()->json([
+            'success' => 0,
+            'message' => 'Password does not match',
+            'data' => []], 401);
     }
 
     /**
@@ -56,7 +60,7 @@ class LecturerAuth extends Controller
      */
     public function me()
     {
-        if (Auth::guard('lecturerToken')->user()) {
+        if (Auth::guard('adminToken')->user()) {
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data of logged in account successfully',

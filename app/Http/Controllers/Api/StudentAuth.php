@@ -10,16 +10,6 @@ use Illuminate\Support\Facades\Validator;
 class StudentAuth extends Controller
 {
     /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login']]);
-    }
-
-    /**
      * Get a JWT token via given credentials.
      *
      * @param \Illuminate\Http\Request $request
@@ -43,8 +33,19 @@ class StudentAuth extends Controller
         }
 
         $credentials = $request->only('code', 'password');
-        if ($token = $this->guard()->attempt($credentials)) {
-            return $this->respondWithToken($token);
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            $user->tokens()->delete();
+            $token = $user->createToken('API Token')->plainTextToken;
+
+            return response()->json([
+                'success' => 1,
+                'message' => 'Logged in successfully',
+                'data' => [
+                    'user' => $user,
+                    'access_token' => $token
+                ],
+            ]);
         }
 
         return response()->json([
@@ -60,11 +61,11 @@ class StudentAuth extends Controller
      */
     public function me()
     {
-        if ($this->guard()->user()) {
+        if (Auth::guard()->user()) {
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data of logged in account successfully',
-                'data' => $this->guard()->user()]);
+                'data' => ['user' => Auth::guard()->user()]]);
         }
     }
 
@@ -75,7 +76,8 @@ class StudentAuth extends Controller
      */
     public function logout(Request $request)
     {
-        $this->guard()->logout();
+        $user = Auth::guard()->user();
+        $user->tokens()->delete();
 
         return response()->json([
             'success' => 1,
@@ -91,34 +93,5 @@ class StudentAuth extends Controller
     public function refresh()
     {
         return $this->respondWithToken($this->guard()->refresh());
-    }
-
-    /**
-     * Get the token array structure.
-     *
-     * @param string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'success' => 1,
-            'message' => 'Logged in successfully',
-            'data' => [
-                'user' => $this->guard()->user(),
-                'access_token' => $token
-            ],
-        ]);
-    }
-
-    /**
-     * Get the guard to be used during authentication.
-     *
-     * @return \Illuminate\Contracts\Auth\Guard
-     */
-    public function guard()
-    {
-        return Auth::guard();
     }
 }

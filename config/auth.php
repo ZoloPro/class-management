@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'api',
+        'guard' => 'web',
         'passwords' => 'students',
     ],
 
@@ -38,15 +38,27 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
-        ],
-        'api' => [
-            'driver' => 'jwt',
             'provider' => 'students',
         ],
-        'lecturerApi' => [
-            'driver' => 'jwt',
+        'studentToken' => [
+            'driver' => 'sanctum',
+            'provider' => 'students',
+        ],
+        'lecturer' => [
+            'driver' => 'session',
             'provider' => 'lecturers',
+        ],
+        'lecturerToken' => [
+            'driver' => 'sanctum',
+            'provider' => 'lecturers',
+        ],
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+        'adminToken' => [
+            'driver' => 'sanctum',
+            'provider' => 'admins',
         ]
     ],
 
@@ -75,6 +87,10 @@ return [
         'lecturers' => [
             'driver' => 'eloquent',
             'model' => \App\Models\Lecturer::class,
+        ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\Admin::class,
         ]
 
         // 'users' => [
