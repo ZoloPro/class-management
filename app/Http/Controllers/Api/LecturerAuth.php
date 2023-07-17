@@ -46,7 +46,13 @@ class LecturerAuth extends Controller
                     'access_token' => $token
                 ],
             ]);
+
         }
+
+        return response()->json([
+            'success' => 0,
+            'message' => 'Password does not match',
+            'data' => []], 401);
     }
 
     /**
