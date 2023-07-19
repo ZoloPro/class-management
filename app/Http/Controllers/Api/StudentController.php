@@ -254,11 +254,13 @@ class StudentController extends Controller
                 'success' => 1,
                 'message' => 'Get classroom detail successfully',
                 'data' => [
-                    'id' => $classroom->id,
-                    'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
-                    'term' => $classroom->term,
-                    'grade' => $grade,
-                    'students' => $students,
+                    'classroom' => [
+                        'id' => $classroom->id,
+                        'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
+                        'term' => $classroom->term,
+                        'grade' => $grade,
+                    ],
+                    'studentList' => $students,
                 ]
             ]);
         } catch (\Exception $e) {
