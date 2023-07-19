@@ -75,7 +75,7 @@ Route::prefix('/student')->group(function () {
         Route::get('/logout', [Api\StudentAuth::class, 'logout']);
         Route::get('/me', [Api\StudentAuth::class, 'me']);
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
-//        Route::get('/grade/', [Api\StudentController::class, 'getClassroomDetail']);
+        Route::get('/gradeList/', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/grade', [Api\StudentController::class, 'getGradesByLoggedStudent']);
     });
 });

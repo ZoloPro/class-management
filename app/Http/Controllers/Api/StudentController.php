@@ -283,10 +283,13 @@ class StudentController extends Controller
                     'grade' => $grade->grade->grade
                 ];
             });
+            $avgGrade = round($grades->avg('grade'), 2);
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data successfully',
-                'data' => ['grades' => $grades],
+                'data' => [
+                    'avgGrade' => $avgGrade,
+                    'grades' => $grades],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
