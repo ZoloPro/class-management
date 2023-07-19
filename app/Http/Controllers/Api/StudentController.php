@@ -246,9 +246,9 @@ class StudentController extends Controller
                 ], 400);
             }
             $grade = $student->hasGrades()->find($request->classroomId)->grade->grade;
-            $students = $classroom->registeredStudents()->get();
+            $students = $classroom->registeredStudents;
             $students = $students->map(function ($student) {
-                return $student->only(['code', 'famMidName', 'name', 'gender']);
+                return $student->get()->except('register_classroom');
             });
             return response()->json([
                 'success' => 1,
