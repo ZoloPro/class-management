@@ -50,14 +50,14 @@ class Classroom extends Model
         )->as('attendance');
     }
 
-    public function hasMarks(): BelongsToMany
+    public function hasGrades(): BelongsToMany
     {
         return $this->belongsToMany(
             Student::class,
-            'mark',
+            'grade',
             'classroomId',
             'studentId'
-        )->as('mark')->withPivot('mark');
+        )->as('grade')->withPivot('grade');
     }
 
     public function lecturer(): BelongsTo

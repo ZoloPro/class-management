@@ -193,27 +193,27 @@ class LecturerController extends Controller
         }
     }
 
-    public function getMarksByClassroom(Request $request)
+    public function getGradesByClassroom(Request $request)
     {
         try {
             $lecturer = Auth::user();
             $classroom = $lecturer->classrooms()->find($request->classroomId);
             $studetns = $classroom->registeredStudents;
-            $markList = $studetns->map(function ($student) use ($request) {
-                $mark = $student->hasMarks()->find($request->classroomId);
-                $studentMark = $mark ? $mark->mark->mark : null;
+            $gradeList = $studetns->map(function ($student) use ($request) {
+                $grade = $student->hasGrades()->find($request->classroomId);
+                $studentGrade = $grade ? $grade->grade->grade : null;
                 return [
                     'code' => $student->code,
                     'famMidName' => $student->famMidName,
                     'name' => $student->name,
                     'gender' => $student->gender,
-                    'mark' => $studentMark,
+                    'grade' => $studentGrade,
                 ];
             });
             return response()->json([
                 'status' => 1,
                 'message' => 'Get data successfully',
-                'markList' => $markList,
+                'gradeList' => $gradeList,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

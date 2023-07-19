@@ -51,13 +51,13 @@ class Student extends Authenticatable
         )->as('attendance');
     }
 
-    public function hasMarks(): BelongsToMany
+    public function hasGrades(): BelongsToMany
     {
         return $this->belongsToMany(
             Classroom::class,
-            'mark',
+            'grade',
             'studentId',
             'classroomId'
-        )->as('mark')->withPivot('mark');
+        )->as('grade')->withPivot('grade');
     }
 }

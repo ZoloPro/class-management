@@ -245,7 +245,7 @@ class StudentController extends Controller
                     'data' => []
                 ], 400);
             }
-            $mark = $student->hasMarks()->find($request->classroomId)->mark->mark;
+            $grade = $student->hasGrades()->find($request->classroomId)->grade->grade;
             $students = $classroom->registeredStudents()->get();
             $students = $students->map(function ($student) {
                 return $student->only(['code', 'famMidName', 'name', 'gender']);
@@ -257,7 +257,7 @@ class StudentController extends Controller
                     'id' => $classroom->id,
                     'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
                     'term' => $classroom->term,
-                    'mark' => $mark,
+                    'grade' => $grade,
                     'students' => $students,
                 ]
             ]);
@@ -271,22 +271,22 @@ class StudentController extends Controller
     }
 
     //Lấy tất cả điểm của sinh viên đang đăng nhập
-    public function getMarksByLoggedStudent()
+    public function getGradesByLoggedStudent()
     {
         try {
             $student = Auth::user();
-            $marks = $student->hasMarks;
-            $marks = $marks->map(function ($mark) {
+            $grades = $student->hasGrades;
+            $grades = $grades->map(function ($grade) {
                 return [
-                    'termId' => $mark->term->id,
-                    'termName' => $mark->term->termName,
-                    'mark' => $mark->mark->mark
+                    'termId' => $grade->term->id,
+                    'termName' => $grade->term->termName,
+                    'grade' => $grade->grade->grade
                 ];
             });
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data successfully',
-                'data' => ['marks' => $marks],
+                'data' => ['grades' => $grades],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
