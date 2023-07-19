@@ -27,4 +27,15 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, Throwable $exception)
+    {
+        if ($exception->getCode() == 23000) {
+            return response()->json([
+                'susscess' => 0,
+                'message' => 'Foreign Key Constraint Violation',
+                'errorCode' => 2300], 400);
+        }
+        return parent::render($request, $exception);
+    }
 }

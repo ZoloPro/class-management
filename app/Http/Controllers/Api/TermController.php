@@ -47,7 +47,9 @@ class TermController extends Controller
         } catch (\Exception $e) {
             // Return Json Response
             return response()->json([
-                'message' => "Something went really wrong!"
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 500);
         }
     }
@@ -87,8 +89,8 @@ class TermController extends Controller
             // Return Json Response
             return response()->json([
                 'success' => 0,
-                'message' => "Something went really wrong!",
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -109,8 +111,8 @@ class TermController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
-                'message' => 'Something went wrong!',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
 

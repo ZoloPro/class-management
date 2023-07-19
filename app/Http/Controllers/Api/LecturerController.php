@@ -53,8 +53,8 @@ class LecturerController extends Controller
             // Return Json Response
             return response()->json([
                 'success' => 0,
-                'message' => "Something went really wrong!",
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -91,8 +91,8 @@ class LecturerController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
-                'message' => 'Something went wrong!',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
                 'data' => [],
             ], 400);
         }
@@ -111,9 +111,9 @@ class LecturerController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
-                'message' => 'Something went wrong!',
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -127,13 +127,15 @@ class LecturerController extends Controller
             HeadingRowFormatter::default('none');
             Excel::import(new lecturersImport, $request->file);
             return response()->json([
-                'message' => 'Data was imported successfully'
+                'success' => 1,
+                'message' => 'Data was imported successfully',
+                'data' => [],
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
-                'message' => 'Something went wrong!'
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -159,9 +161,9 @@ class LecturerController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
-                'message' => 'Something went wrong!',
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -184,9 +186,9 @@ class LecturerController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
-                'message' => 'Something went wrong!',
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -215,11 +217,20 @@ class LecturerController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
-                'message' => 'Something went wrong!',
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
+    }
+
+    public function downloadExampleImportFile()
+    {
+        $file = storage_path("app/public/example/lecturers.xlsx");
+        $headers = [
+            'Content-Type: application/xlsx',
+        ];
+        return response()->download($file, 'example-lecturers.xlsx', $headers);
     }
 
 }

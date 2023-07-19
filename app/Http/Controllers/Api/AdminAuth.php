@@ -75,13 +75,22 @@ class AdminAuth extends Controller
      */
     public function logout()
     {
-        $user = Auth::guard()->user();
-        $user->tokens()->delete();
+        try {
+            $user = Auth::guard()->user();
+            $user->tokens()->delete();
 
-        return response()->json([
-            'success' => 1,
-            'message' => 'Successfully logged out',
-            'data' => []], 200);
+            return response()->json([
+                'success' => 1,
+                'message' => 'Successfully logged out',
+                'data' => []], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Failed to log out',
+                'error' => $e->getMessage(),
+                'data' => []], 400);
+        }
+
     }
 
     /**

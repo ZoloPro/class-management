@@ -57,8 +57,8 @@ class StudentController extends Controller
             // Return Json Response
             return response()->json([
                 'success' => 0,
-                'message' => "Something went really wrong!",
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
                 'data' => []], 400);
         }
     }
@@ -104,8 +104,8 @@ class StudentController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
-                'message' => 'Something went wrong!',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
                 'data' => [],
             ], 400);
         }
@@ -126,9 +126,8 @@ class StudentController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
-                'message' => 'Something went wrong!',
-                'error' => $e->getMessage(),
-                'data' => [],
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -139,11 +138,15 @@ class StudentController extends Controller
             HeadingRowFormatter::default('none');
             Excel::import(new StudentsImport(), $request->file);
             return response()->json([
-                'message' => 'Data was imported successfully'
+                'success' => 1,
+                'message' => 'Data was imported successfully',
+                'data' => [],
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Something went wrong!'
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400
             );
         }
@@ -173,9 +176,9 @@ class StudentController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 0,
-                'error' => $e->getMessage(),
-                'message' => 'Something went wrong!',
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -223,8 +226,8 @@ class StudentController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
-                'message' => 'Something went wrong!',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -261,13 +264,13 @@ class StudentController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
-                'error' => $e->getMessage(),
-                'message' => 'Something went wrong!',
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
 
-    //Lấy tất cả điểm của sinh viên đăng đăng nhập
+    //Lấy tất cả điểm của sinh viên đang đăng nhập
     public function getMarksByLoggedStudent()
     {
         try {
@@ -283,13 +286,13 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data successfully',
-                'marks' => $marks,
+                'data' => ['marks' => $marks],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
-                'message' => 'Something went wrong!',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }

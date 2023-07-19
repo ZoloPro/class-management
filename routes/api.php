@@ -29,29 +29,38 @@ Route::apiResource('/mark', Api\TermController::class);
 Route::prefix('/admin')->group(function () {
     Route::post('/login', [Api\AdminAuth::class, 'login']);
 
-    Route::prefix('/import')->group(function () {
-        Route::post('/lecturers', [Api\LecturerController::class, 'import']);
-        Route::post('/students', [Api\StudentController::class, 'import']);
+
+    Route::middleware('auth:adminToken')->group(function () {
+        Route::prefix('/import')->group(function () {
+            Route::post('/lecturers', [Api\LecturerController::class, 'import']);
+            Route::get('/lecturers/example', [Api\LecturerController::class, 'downloadExampleImportFile']);
+            Route::post('/students', [Api\StudentController::class, 'import']);
+        });
+
+        Route::get('/logout', [Api\AdminAuth::class, 'logout']);
+
+        Route::get('/lecturers', [Api\LecturerController::class, 'index']);
+        Route::post('/lecturers', [Api\LecturerController::class, 'store']);
+        Route::put('/lecturers/{id}', [Api\LecturerController::class, 'update']);
+        Route::delete('/lecturers/{id}', [Api\LecturerController::class, 'destroy']);
+
+        Route::get('/students', [Api\StudentController::class, 'index']);
+        Route::post('/students', [Api\StudentController::class, 'store']);
+        Route::put('/students/{id}', [Api\StudentController::class, 'update']);
+        Route::delete('/students/{id}', [Api\StudentController::class, 'destroy']);
+
+        Route::get('/terms', [Api\TermController::class, 'index']);
+        Route::post('/terms', [Api\TermController::class, 'store']);
+        Route::put('/terms/{id}', [Api\TermController::class, 'update']);
+        Route::delete('/terms/{id}', [Api\TermController::class, 'destroy']);
+
+        Route::get('/classrooms', [Api\ClassroomController::class, 'index']);
+        Route::post('/classrooms', [Api\ClassroomController::class, 'store']);
+        Route::delete('/classrooms/{id}', [Api\ClassroomController::class, 'destroy']);
+        Route::get('/classrooms/{id}', [Api\ClassroomController::class, 'getStudentsByClassroom']);
+        Route::put('/classrooms/{id}/student', [Api\ClassroomController::class, 'updateStudentListByClassroom']);
     });
-    Route::get('/lecturers', [Api\LecturerController::class, 'index']);
-    Route::post('/lecturers', [Api\LecturerController::class, 'store']);
-    Route::put('/lecturers/{id}', [Api\LecturerController::class, 'update']);
-    Route::delete('/lecturers/{id}', [Api\LecturerController::class, 'destroy']);
 
-    Route::get('/students', [Api\StudentController::class, 'index']);
-    Route::post('/students', [Api\StudentController::class, 'store']);
-    Route::put('/students/{id}', [Api\StudentController::class, 'update']);
-    Route::delete('/students/{id}', [Api\StudentController::class, 'destroy']);
-
-    Route::get('/terms', [Api\TermController::class, 'index']);
-    Route::post('/terms', [Api\TermController::class, 'store']);
-    Route::put('/terms/{id}', [Api\TermController::class, 'update']);
-    Route::delete('/terms/{id}', [Api\TermController::class, 'destroy']);
-
-    Route::get('/classrooms', [Api\ClassroomController::class, 'index']);
-    Route::post('/classrooms', [Api\ClassroomController::class, 'store']);
-    Route::delete('/classrooms/{id}', [Api\ClassroomController::class, 'destroy']);
-    Route::get('/classrooms/{id}', [Api\ClassroomController::class, 'getStudentsByClassroom']);
 
 //        Route::get('/me', [Api\StudentAuth::class, 'me']);
 //        Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);

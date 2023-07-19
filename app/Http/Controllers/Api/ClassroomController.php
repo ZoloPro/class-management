@@ -56,8 +56,8 @@ class ClassroomController extends Controller
             // Return Json Response
             return response()->json([
                 'success' => 0,
-                'message' => "Something went really wrong!",
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }
@@ -98,16 +98,10 @@ class ClassroomController extends Controller
                 'message' => `Deleted classroom with id ${id} successfully`,
                 'data' => []], 200);
         } catch (\Exception $e) {
-            if ($e->getCode() == 23000) {
-                return response()->json([
-                    'success' => 0,
-                    'message' => 'Integrity constraint violation',
-                    'data' => []], 400);
-            }
             return response()->json([
                 'success' => 0,
-                'message' => 'Something went wrong!',
-                'error' => $e->getCode(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400
             );
         }
@@ -127,7 +121,7 @@ class ClassroomController extends Controller
             $lecturer = $classroom->lecturer->only(['code', 'fullname']);
             $students = $classroom->registeredStudents()->get();
             $students = $students->map(function ($student) {
-                return $student->only(['code', 'famMidName', 'name', 'gender']);
+                return $student->only(['id', 'code', 'famMidName', 'name', 'gender']);
             });
 
             // Return Json Response
@@ -142,8 +136,42 @@ class ClassroomController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
-                'message' => 'Something went wrong!',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
+            ], 400);
+        }
+    }
+
+    function updateStudentListByClassroom(string $id, Request $request)
+    {
+        try {
+            $classroom = Classroom::find($id);
+            if (!$classroom) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => 'Classroom information not found',
+                    'data' => []
+                ], 400);
+            }
+            $classroom->registeredStudents()->sync($request->students);
+            $lecturer = $classroom->lecturer->only(['code', 'fullname']);
+            $students = $classroom->registeredStudents()->get();
+            $students = $students->map(function ($student) {
+                return $student->only(['id', 'code', 'famMidName', 'name', 'gender']);
+            });
+            return response()->json([
+                'success' => 1,
+                'message' => 'Update student list successfully',
+                'data' => ['classroom' => [
+                    'lecture' => $lecturer,
+                    'term' => $classroom->term,
+                    'students' => $students
+                ]]], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
             ], 400);
         }
     }

@@ -35,7 +35,6 @@ class StudentAuth extends Controller
         $credentials = $request->only('code', 'password');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            $user->tokens()->delete();
             $token = $user->createToken('API Token')->plainTextToken;
 
             return response()->json([
@@ -77,7 +76,7 @@ class StudentAuth extends Controller
     public function logout(Request $request)
     {
         $user = Auth::guard()->user();
-        $user->tokens()->delete();
+        $user->tokens()->currentAccessToken()->delete();
 
         return response()->json([
             'success' => 1,
