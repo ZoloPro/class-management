@@ -95,7 +95,7 @@ class ClassroomController extends Controller
             Classroom::destroy($id);
             return response()->json([
                 'success' => 1,
-                'message' => `Deleted classroom with id ${id} successfully`,
+                'message' => "Deleted classroom with id {$id} successfully",
                 'data' => []], 200);
         } catch (\Exception $e) {
             return response()->json([

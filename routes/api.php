@@ -1,9 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api;
-use App\Http\Middleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,16 +14,6 @@ use App\Http\Middleware;
 |
 */
 
-/*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::apiResource('/lecturers', Api\LecturerController::class);
-Route::apiResource('/students', Api\StudentController::class)->middleware('auth:api');
-Route::apiResource('/terms', Api\TermController::class);
-Route::apiResource('/classroom', Api\ClassroomController::class);
-Route::apiResource('/mark', Api\TermController::class);
-*/
 Route::prefix('/admin')->group(function () {
     Route::post('/login', [Api\AdminAuth::class, 'login']);
 
@@ -35,9 +23,9 @@ Route::prefix('/admin')->group(function () {
             Route::post('/lecturers', [Api\LecturerController::class, 'import']);
             Route::get('/lecturers/example', [Api\LecturerController::class, 'downloadExampleImportFile']);
             Route::post('/students', [Api\StudentController::class, 'import']);
-            Route::post('/students/example', [Api\StudentController::class, 'downloadExampleImportFile']);
+            Route::get('/students/example', [Api\StudentController::class, 'downloadExampleImportFile']);
             Route::post('/terms', [Api\TermController::class, 'import']);
-            Route::post('/terms/example', [Api\TermController::class, 'downloadExampleImportFile']);
+            Route::get('/terms/example', [Api\TermController::class, 'downloadExampleImportFile']);
         });
 
         Route::get('/logout', [Api\AdminAuth::class, 'logout']);
@@ -63,12 +51,6 @@ Route::prefix('/admin')->group(function () {
         Route::get('/classrooms/{id}', [Api\ClassroomController::class, 'getStudentsByClassroom']);
         Route::put('/classrooms/{id}/student', [Api\ClassroomController::class, 'updateStudentListByClassroom']);
     });
-
-
-//        Route::get('/me', [Api\StudentAuth::class, 'me']);
-//        Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
-//        Route::get('/classrooms/{classroomId}', [Api\StudentController::class, 'getClassroomDetail']);
-//        Route::get('/mark', [Api\StudentController::class, 'getMarksByLoggedStudent']);
 });
 
 Route::prefix('/student')->group(function () {
@@ -80,6 +62,8 @@ Route::prefix('/student')->group(function () {
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
         Route::get('/gradeList/', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/grade', [Api\StudentController::class, 'getGradesByLoggedStudent']);
+
+        Route::get('/document', [Api\DocumentController::class, 'getDocumentsByClassroom']);
     });
 });
 
@@ -93,28 +77,14 @@ Route::prefix('/lecturer')->group(function () {
         Route::get('/classrooms', [Api\LecturerController::class, 'getClassroomsByLoggedLecturer']);
         Route::get('/classrooms/{classroomId}/mark', [Api\LecturerController::class, 'getMarksByClassroom']);
 //        Route::get('/classrooms/{classroomId}/attendance', [Api\StudentController::class, 'getMarksByLoggedStudent']);
+
+        Route::post('/documents/{classroomId}', [Api\DocumentController::class, 'uploadFile']);
     });
 });
 
-//Route::get('/students/{id}/classrooms', [Api\StudentController::class, 'getAllClassrooms'])->middleware('api');
-//
-//Route::get('/lecturers/{id}/classrooms', [Api\LecturerController::class, 'getClassroomsByLecturer']);
-//
-//Route::post('/login/student', [Api\StudentAuth::class, 'login']);
-//
-//Route::get('/logout/student', [Api\StudentAuth::class, 'logout']);
-//
-//Route::post('/login/lecturer', [Api\LecturerAuth::class, 'login']);
-//
-//Route::post('/reset', [Api\LecturerAuth::class, 'resetAllPassword']);
-//
 //Route::get('/attendance/{id}', [Api\AttendanceController::class, 'generateAttendanceLink']);
 //
 //Route::post('/attendance', [Api\AttendanceController::class, 'attend']);
-//
-//Route::get('/me', [Api\StudentAuth::class, 'me'])->middleware('auth');
-//
-//Route::get('/classrooms/{id}/students', [Api\ClassroomController::class, 'getStudentsByClassroom']);
 
 Route::fallback(function () {
     return response()->json([

@@ -181,8 +181,9 @@ class LecturerController extends Controller
                 ];
             });
             return response()->json([
-                'status' => 1,
-                'classrooms' => $classrooms,
+                'success' => 1,
+                'message' => 'Get data successfully',
+                'data' => ['classrooms' => $classrooms],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -226,7 +227,7 @@ class LecturerController extends Controller
 
     public function downloadExampleImportFile()
     {
-        $file = storage_path("app/public/example/example-example-lecturers.xlsx");
+        $file = storage_path("app/public/example/example-lecturers.xlsx");
         $headers = [
             'Content-Type: application/xlsx',
         ];

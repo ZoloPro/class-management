@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Classroom extends Model
 {
@@ -68,5 +69,10 @@ class Classroom extends Model
     public function term(): BelongsTo
     {
         return $this->BelongsTo(Term::class, 'termId');
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class, 'classroomId');
     }
 }
