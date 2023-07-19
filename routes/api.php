@@ -35,6 +35,9 @@ Route::prefix('/admin')->group(function () {
             Route::post('/lecturers', [Api\LecturerController::class, 'import']);
             Route::get('/lecturers/example', [Api\LecturerController::class, 'downloadExampleImportFile']);
             Route::post('/students', [Api\StudentController::class, 'import']);
+            Route::post('/students/example', [Api\StudentController::class, 'downloadExampleImportFile']);
+            Route::post('/terms', [Api\TermController::class, 'import']);
+            Route::post('/terms/example', [Api\TermController::class, 'downloadExampleImportFile']);
         });
 
         Route::get('/logout', [Api\AdminAuth::class, 'logout']);

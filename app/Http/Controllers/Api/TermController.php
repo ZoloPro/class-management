@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Import\TermsImport;
 use App\Models\Term;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
 class TermController extends Controller
 {
@@ -116,5 +119,34 @@ class TermController extends Controller
             ], 400);
         }
 
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            HeadingRowFormatter::default('none');
+            Excel::import(new TermsImport(), $request->file);
+            return response()->json([
+                'success' => 1,
+                'message' => 'Data was imported successfully',
+                'data' => [],
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
+            ], 400
+            );
+        }
+    }
+
+    public function downloadExampleImportFile()
+    {
+        $file = storage_path("app/public/example/example-terms.xlsx");
+        $headers = [
+            'Content-Type: application/xlsx',
+        ];
+        return response()->download($file, 'example-terms.xlsx', $headers);
     }
 }

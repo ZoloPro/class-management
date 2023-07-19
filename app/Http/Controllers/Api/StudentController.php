@@ -246,9 +246,11 @@ class StudentController extends Controller
                 ], 400);
             }
             $grade = $student->hasGrades()->find($request->classroomId)->grade->grade;
-            $students = $classroom->registeredStudents;
+            $students = $classroom->registeredStudents()->get();
             $students = $students->map(function ($student) {
-                return $student->get()->except('register_classroom');
+                $student = collect($student);
+
+                return $student->except('register_classroom');
             });
             return response()->json([
                 'success' => 1,
@@ -258,8 +260,9 @@ class StudentController extends Controller
                         'id' => $classroom->id,
                         'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
                         'term' => $classroom->term,
-                        'grade' => $grade,
+
                     ],
+                    'grade' => $grade,
                     'studentList' => $students,
                 ]
             ]);
@@ -300,5 +303,14 @@ class StudentController extends Controller
                 'errorCode' => $e->getCode(),
             ], 400);
         }
+    }
+
+    public function downloadExampleImportFile()
+    {
+        $file = storage_path("app/public/example/example-students.xlsx");
+        $headers = [
+            'Content-Type: application/xlsx',
+        ];
+        return response()->download($file, 'example-students.xlsx', $headers);
     }
 }

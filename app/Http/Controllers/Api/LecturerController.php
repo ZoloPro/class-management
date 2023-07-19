@@ -226,11 +226,11 @@ class LecturerController extends Controller
 
     public function downloadExampleImportFile()
     {
-        $file = storage_path("app/public/example/lecturers.xlsx");
+        $file = storage_path("app/public/example/example-example-lecturers.xlsx");
         $headers = [
             'Content-Type: application/xlsx',
         ];
-        return response()->download($file, 'example-lecturers.xlsx', $headers);
+        return response()->download($file, 'example-example-lecturers.xlsx', $headers);
     }
 
 }
