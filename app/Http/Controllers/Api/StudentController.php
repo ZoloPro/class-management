@@ -245,7 +245,7 @@ class StudentController extends Controller
                     'data' => []
                 ], 400);
             }
-            $grade = $student->hasGrades()->find($request->classroomId)->grade->grade ?? null;
+            $grade = $student->hasGrades()->find($request->classroomId)->grade->grade ?? '';
             $students = $classroom->registeredStudents()->get();
             $students = $students->map(function ($student) {
                 $student = collect($student);
