@@ -35,4 +35,9 @@ class Lecturer extends Authenticatable
     {
         return $this->hasMany(Classroom::class, 'lecturerId');
     }
+
+    public function documents()
+    {
+        return $this->hasManyThrough(Document::class, Classroom::class, 'lecturerId', 'classroomId');
+    }
 }

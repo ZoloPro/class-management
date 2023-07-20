@@ -60,10 +60,10 @@ Route::prefix('/student')->group(function () {
         Route::get('/logout', [Api\StudentAuth::class, 'logout']);
         Route::get('/me', [Api\StudentAuth::class, 'me']);
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
-        Route::get('/gradeList/', [Api\StudentController::class, 'getClassroomDetail']);
+        Route::post('/gradeList/', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/grade', [Api\StudentController::class, 'getGradesByLoggedStudent']);
 
-        Route::get('/document', [Api\DocumentController::class, 'getDocumentsByClassroom']);
+        Route::post('/document', [Api\DocumentController::class, 'getDocumentsByClassroom']);
     });
 });
 
@@ -78,7 +78,9 @@ Route::prefix('/lecturer')->group(function () {
         Route::get('/classrooms/{classroomId}/mark', [Api\LecturerController::class, 'getMarksByClassroom']);
 //        Route::get('/classrooms/{classroomId}/attendance', [Api\StudentController::class, 'getMarksByLoggedStudent']);
 
+        Route::get('/documents/{classroomId}', [Api\DocumentController::class, 'getDocumentsByClassLecturer']);
         Route::post('/documents/{classroomId}', [Api\DocumentController::class, 'uploadFile']);
+        Route::delete('/documents/{classroomId}', [Api\DocumentController::class, 'destroy']);
     });
 });
 

@@ -174,11 +174,7 @@ class LecturerController extends Controller
             $lecturer = Auth::user();
             $classrooms = $lecturer->classrooms;
             $classrooms = $classrooms->map(function ($classroom) {
-                return [
-                    'id' => $classroom->id,
-                    'termId' => $classroom->termId,
-                    'termName' => $classroom->term->termName,
-                ];
+                return $classroom->only(['id', 'term']);
             });
             return response()->json([
                 'success' => 1,

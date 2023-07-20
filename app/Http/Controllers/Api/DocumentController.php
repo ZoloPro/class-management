@@ -38,10 +38,11 @@ class DocumentController extends Controller
         $folder = "{$classroom->term->termName}_{$classroom->id}";
         $path = $request->file('file')->storeAs($folder, $fileName, 'azure');
         $url = Storage::disk('azure')->url($path);
-        $uploadedFileName = pathinfo($path, PATHINFO_FILENAME) . '.' . $request->file->getClientOriginalExtension();
+        $uploadedFileName = pathinfo($path, PATHINFO_FILENAME) . '.' . pathinfo($path, PATHINFO_EXTENSION);
         Document::create([
             'classroomId' => $classroom->id,
             'fileName' => $uploadedFileName,
+            'path' => $path,
             'url' => $url,
         ]);
         return response()->json([
@@ -70,5 +71,44 @@ class DocumentController extends Controller
             'message' => 'Get data successfully',
             'data' => ['documents' => $documents],
         ], 200);
+    }
+
+    public function getDocumentsByClassLecturer(Request $request)
+    {
+
+        $lecturer = Auth::guard('lecturerToken')->user();
+        $classroom = $lecturer->classrooms()->find($request->classroomId);
+        if (!$classroom) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Classroom does not exist',
+                'data' => []], 400);
+        }
+        $documents = $classroom->documents()->get();
+        return response()->json([
+            'success' => 1,
+            'message' => 'Get data successfully',
+            'data' => [
+                'classroom' => $classroom->only(['id', 'term']),
+                'documents' => $documents],
+        ], 200);
+    }
+
+    public function destroy(string $classroomId)
+    {
+        $lecturer = Auth::guard('lecturerToken')->user();
+        $document = $lecturer->documents()->find($classroomId);
+        if (!$document) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Document does not exist',
+                'data' => []], 400);
+        }
+        Storage::disk('azure')->delete('Lập trình cơ bản_3/1689787778_scribd.vpdfs.com_de-cuong-on-tap-thi-cuoi-ky-oop-lap-trinh-huong-doi-tuong-uit.pdf');
+        $document->delete();
+        return response()->json([
+            'success' => 1,
+            'message' => 'Delete document successfully',
+            'data' => []], 200);
     }
 }
