@@ -54,25 +54,6 @@ class DocumentController extends Controller
         ]);
     }
 
-    public function getDocumentsByClassroom(Request $request)
-    {
-
-        $student = Auth::user();
-        $classroom = $student->registeredClassrooms()->find($request->classroomId);
-        if (!$classroom) {
-            return response()->json([
-                'success' => 0,
-                'message' => 'Classroom does not exist',
-                'data' => []], 400);
-        }
-        $documents = $classroom->documents()->get();
-        return response()->json([
-            'success' => 1,
-            'message' => 'Get data successfully',
-            'data' => ['documents' => $documents],
-        ], 200);
-    }
-
     public function getDocumentsByClassLecturer(Request $request)
     {
 

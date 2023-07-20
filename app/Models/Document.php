@@ -18,6 +18,7 @@ class Document extends Model
     protected $fillable = [
         'classroomId',
         'fileName',
+        'path',
         'url',
     ];
 

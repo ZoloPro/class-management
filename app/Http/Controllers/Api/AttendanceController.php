@@ -16,6 +16,15 @@ class AttendanceController extends Controller
 {
     public function generateAttendanceLink(Request $request)
     {
+        $lecturer = auth('lecturerToken')->user();
+        $classroom = $lecturer->classrooms()->find($request->id);
+        if (!$classroom) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Classroom not found',
+                'data' => [],
+            ], 400);
+        }
         $key = env('ATTENDANCE_JWT_SECRET');
         $payload = [
             'classroomId' => $request->id,
@@ -23,8 +32,11 @@ class AttendanceController extends Controller
         ];
         $token = JWT::encode($payload, $key, 'HS256');
         return response()->json([
-            'status' => 1,
-            'URL' => "{$_SERVER['SERVER_NAME']}:{$_SERVER['SERVER_PORT']}/api/attendance?token={$token}",
+            'success' => 1,
+            'message' => 'Generate successfully',
+            'data' => [
+                'url' => "{$_SERVER['SERVER_NAME']}:{$_SERVER['SERVER_PORT']}/api/attendance?token={$token}",
+            ]
         ], 200);
     }
 
@@ -35,14 +47,15 @@ class AttendanceController extends Controller
             $token = $request->query('token');
             if (!$token) {
                 return response()->json([
-                    'status' => 0,
-                    'message' => 'token is unavailable'
+                    'successs' => 0,
+                    'message' => 'token is unavailable',
+                    'data' => [],
                 ], 400);
             }
             $decode = JWT::decode($token, new Key($key, 'HS256'));
             $classroom = Classroom::find($decode->classroomId);
             $student = $classroom->registeredStudents()->where('code', $request->studentCode)->first();
-            if(!$student) {
+            if (!$student) {
                 return response()->json([
                     'status' => 0,
                     'message' => 'No student found in class',

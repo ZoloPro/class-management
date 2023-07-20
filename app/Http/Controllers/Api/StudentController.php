@@ -249,9 +249,10 @@ class StudentController extends Controller
             $students = $classroom->registeredStudents()->get();
             $students = $students->map(function ($student) {
                 $student = collect($student);
-
                 return $student->except('register_classroom');
             });
+
+            $documents = $classroom->documents()->get();
             return response()->json([
                 'success' => 1,
                 'message' => 'Get classroom detail successfully',
@@ -264,6 +265,7 @@ class StudentController extends Controller
                     ],
                     'grade' => $grade,
                     'studentList' => $students,
+                    'documents' => $documents,
                 ]
             ]);
         } catch (\Exception $e) {
