@@ -253,6 +253,10 @@ class StudentController extends Controller
             });
 
             $documents = $classroom->documents()->get();
+            $documents = $documents->map(function ($document) {
+                $document = collect($document);
+                return $document->except('classroomId');
+            });
             return response()->json([
                 'success' => 1,
                 'message' => 'Get classroom detail successfully',
