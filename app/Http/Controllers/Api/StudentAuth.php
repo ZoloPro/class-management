@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class StudentAuth extends Controller
@@ -84,13 +85,34 @@ class StudentAuth extends Controller
             'data' => []], 200);
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function refresh()
+    public function changePassword(Request $request)
     {
-        return $this->respondWithToken($this->guard()->refresh());
+        $validator = Validator::make($request->all(), [
+            'oldPassword' => 'required',
+            'newPassword' => 'required',
+            'confirmPassword' => 'required|same:newPassword',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Validation failed',
+                'data' => $validator->errors()
+            ], 400);
+        }
+        $student = Auth::user();
+        if (!Hash::check($request->oldPassword, $student->password)) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Old password is incorrect',
+                'data' => []
+            ], 400);
+        }
+        $student->password = Hash::make($request->newPassword);
+        $student->save();
+        return response()->json([
+            'success' => 1,
+            'message' => 'Change password successfully',
+            'data' => ['user' => $student],
+        ], 200);
     }
 }

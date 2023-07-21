@@ -62,7 +62,7 @@ Route::prefix('/student')->group(function () {
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
         Route::post('/detail/', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/grade', [Api\StudentController::class, 'getGradesByLoggedStudent']);
-        Route::post('/password', [Api\StudentController::class, 'changePassword']);
+        Route::post('/password', [Api\StudentAuth::class, 'changePassword']);
     });
 });
 

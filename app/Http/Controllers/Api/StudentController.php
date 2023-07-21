@@ -321,34 +321,4 @@ class StudentController extends Controller
         return response()->download($file, 'example-students.xlsx', $headers);
     }
 
-    public function changePassword(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'oldPassword' => 'required',
-            'newPassword' => 'required',
-            'confirmPassword' => 'required|same:newPassword',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => 0,
-                'message' => 'Validation failed',
-                'data' => $validator->errors()
-            ], 400);
-        }
-        $student = Auth::user();
-        if (!Hash::check($request->oldPassword, $student->password)) {
-            return response()->json([
-                'success' => 0,
-                'message' => 'Old password is incorrect',
-                'data' => []
-            ], 400);
-        }
-        $student->password = Hash::make($request->newPassword);
-        $student->save();
-        return response()->json([
-            'success' => 1,
-            'message' => 'Change password successfully',
-            'data' => ['user' => $student],
-        ], 200);
-    }
 }
