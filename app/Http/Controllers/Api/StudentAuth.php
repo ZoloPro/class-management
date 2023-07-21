@@ -77,7 +77,7 @@ class StudentAuth extends Controller
     public function logout(Request $request)
     {
         $user = Auth::guard()->user();
-        $user->tokens()->currentAccessToken()->delete();
+        $user->currentAccessToken()->delete();
 
         return response()->json([
             'success' => 1,

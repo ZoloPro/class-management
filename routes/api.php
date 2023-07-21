@@ -82,6 +82,8 @@ Route::prefix('/lecturer')->group(function () {
         Route::delete('/documents/{classroomId}', [Api\DocumentController::class, 'destroy']);
 
         Route::get('/attendance/{id}', [Api\AttendanceController::class, 'generateAttendanceLink']);
+
+        Route::post('/password', [Api\LecturerAuth::class, 'changePassword']);
     });
 });
 

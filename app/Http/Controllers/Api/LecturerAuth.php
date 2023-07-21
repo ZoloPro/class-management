@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class LecturerAuth extends Controller
@@ -86,13 +87,34 @@ class LecturerAuth extends Controller
             'data' => []], 200);
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function refresh()
+    public function changePassword(Request $request)
     {
-        return $this->respondWithToken($this->guard()->refresh());
+        $validator = Validator::make($request->all(), [
+            'oldPassword' => 'required',
+            'newPassword' => 'required',
+            'confirmPassword' => 'required|same:newPassword',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Validation failed',
+                'data' => $validator->errors()
+            ], 400);
+        }
+        $lecuturer = Auth::guard('lecturerToken') -> user();
+        if (!Hash::check($request->oldPassword, $lecuturer->password)) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Old password is incorrect',
+                'data' => []
+            ], 400);
+        }
+        $lecuturer->password = Hash::make($request->newPassword);
+        $lecuturer->save();
+        return response()->json([
+            'success' => 1,
+            'message' => 'Change password successfully',
+            'data' => ['user' => $lecuturer],
+        ], 200);
     }
 }

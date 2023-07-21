@@ -28,7 +28,7 @@ class AttendanceController extends Controller
         $key = env('ATTENDANCE_JWT_SECRET');
         $payload = [
             'classroomId' => $request->id,
-            'exp' => time() + 30,
+            'exp' => time() + (30 * 24 * 60 * 60),
         ];
         $token = JWT::encode($payload, $key, 'HS256');
         return response()->json([
