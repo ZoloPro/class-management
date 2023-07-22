@@ -75,4 +75,9 @@ class Classroom extends Model
     {
         return $this->hasMany(Document::class, 'classroomId');
     }
+
+    public function attendanceHistory(): HasMany
+    {
+        return $this->hasMany(AttendanceHistory::class, 'classroomId');
+    }
 }

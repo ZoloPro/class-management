@@ -92,11 +92,11 @@ class StudentAuth extends Controller
             'newPassword' => 'required',
             'confirmPassword' => 'required|same:newPassword',
         ]);
-        if ($validator->fails()) {
+        if ($validator->stopOnFirstFailure()->fails()) {
             return response()->json([
                 'success' => 0,
-                'message' => 'Validation failed',
-                'data' => $validator->errors()
+                'message' => $validator->errors()->first(),
+                'data' => [],
             ], 400);
         }
         $student = Auth::user();

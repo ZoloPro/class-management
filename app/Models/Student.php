@@ -20,7 +20,6 @@ class Student extends Authenticatable
         'name',
         'gender',
         'birthdate',
-        'birthdate',
         'phone',
         'email',
         'enrollmentDate',

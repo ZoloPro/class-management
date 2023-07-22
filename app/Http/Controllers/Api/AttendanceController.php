@@ -73,4 +73,11 @@ class AttendanceController extends Controller
             ], 400);
         }
     }
+
+    public function logAttendance(string $classroomId)
+    {
+        $lecturer = auth('lecturerToken')->user();
+        $classrooms = $lecturer->classrooms()->find($classroomId);
+    }
+
 }

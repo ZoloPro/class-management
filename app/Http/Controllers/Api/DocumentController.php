@@ -14,7 +14,7 @@ class DocumentController extends Controller
     public function uploadFile(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240',
+            'file' => 'required|file|mimes:pdf|max:10240',
         ]);
 
         if ($validator->stopOnFirstFailure()->fails()) {
@@ -92,4 +92,5 @@ class DocumentController extends Controller
             'message' => 'Delete document successfully',
             'data' => []], 200);
     }
+
 }
