@@ -57,7 +57,7 @@ class AttendanceController extends Controller
             $decode = JWT::decode($token, new Key($key, 'HS256'));
             $classroom = Classroom::find($decode->classroomId);
             $student = Auth::user();
-            $student = $classroom->attendedStudents()->where('studentId', $student->id)->where('date', date('Y-m-d'))->first();
+            $student = $classroom->students()->find($student->id);
             if (!$student) {
                 return response()->json([
                     'success' => 0,
