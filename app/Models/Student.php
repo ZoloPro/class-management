@@ -47,7 +47,7 @@ class Student extends Authenticatable
             'attendance',
             'studentId',
             'classroomId',
-        )->as('attendance');
+        )->withPivot('date')->as('attendance');
     }
 
     public function hasGrades(): BelongsToMany

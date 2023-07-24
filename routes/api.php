@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureClassroomOwner;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api;
 
@@ -63,6 +64,8 @@ Route::prefix('/student')->group(function () {
         Route::post('/detail/', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/grade', [Api\StudentController::class, 'getGradesByLoggedStudent']);
         Route::post('/password', [Api\StudentAuth::class, 'changePassword']);
+        Route::post('/checkin', [Api\AttendanceController::class, 'checkIn']);
+
     });
 });
 
@@ -81,7 +84,7 @@ Route::prefix('/lecturer')->group(function () {
         Route::post('/documents/{classroomId}', [Api\DocumentController::class, 'uploadFile']);
         Route::delete('/documents/{classroomId}', [Api\DocumentController::class, 'destroy']);
 
-        Route::get('/attendance/{id}', [Api\AttendanceController::class, 'generateAttendanceLink']);
+        Route::get('/attendance/{classroomId}', [Api\AttendanceController::class, 'generateAttendanceLink'])->middleware(EnsureClassroomOwner::class);
 
         Route::post('/password', [Api\LecturerAuth::class, 'changePassword']);
     });

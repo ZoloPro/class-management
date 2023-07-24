@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Classroom extends Model
 {
@@ -48,7 +49,7 @@ class Classroom extends Model
             'attendance',
             'classroomId',
             'studentId',
-        )->as('attendance');
+        )->withPivot('date')->as('attendance');
     }
 
     public function hasGrades(): BelongsToMany
@@ -79,5 +80,10 @@ class Classroom extends Model
     public function attendanceHistory(): HasMany
     {
         return $this->hasMany(AttendanceHistory::class, 'classroomId');
+    }
+
+    public function wifiInfo(): HasOne
+    {
+        return $this->hasOne(WifiInfo::class, 'classroomId');
     }
 }
