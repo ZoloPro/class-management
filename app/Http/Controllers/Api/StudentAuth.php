@@ -51,7 +51,7 @@ class StudentAuth extends Controller
         return response()->json([
             'success' => 0,
             'message' => 'Password does not match',
-            'data' => []], 401);
+            'data' => []], 200);
     }
 
     /**
