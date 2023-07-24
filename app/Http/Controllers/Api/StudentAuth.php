@@ -21,7 +21,7 @@ class StudentAuth extends Controller
     {
         $validator = Validator::make($request->all(), [
             'code' => 'required|string|min:8|max:8|exists:student,code',
-            'password' => 'required|string'
+            'password' => 'required|string|min:8|max:20'
         ], [
             'code.exists' => 'Student code does not exist'
         ]);
