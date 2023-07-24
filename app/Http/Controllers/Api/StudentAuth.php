@@ -30,7 +30,7 @@ class StudentAuth extends Controller
             return response()->json([
                 'success' => 0,
                 'message' => $validator->errors()->first(),
-                'data' => []], 400);
+                'data' => []], 200);
         }
 
         $credentials = $request->only('code', 'password');

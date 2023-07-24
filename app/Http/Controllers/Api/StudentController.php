@@ -8,7 +8,6 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
@@ -244,7 +243,7 @@ class StudentController extends Controller
                     'success' => 0,
                     'message' => 'classroom information not found',
                     'data' => []
-                ], 400);
+                ], 200);
             }
             $grade = $student->hasGrades()->find($request->classroomId)->grade->grade ?? '';
             $students = $classroom->registeredStudents()->get();
