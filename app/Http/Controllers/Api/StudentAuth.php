@@ -97,7 +97,7 @@ class StudentAuth extends Controller
                 'success' => 0,
                 'message' => $validator->errors()->first(),
                 'data' => [],
-            ], 400);
+            ]);
         }
         $student = Auth::user();
         if (!Hash::check($request->oldPassword, $student->password)) {
@@ -105,7 +105,7 @@ class StudentAuth extends Controller
                 'success' => 0,
                 'message' => 'Old password is incorrect',
                 'data' => []
-            ], 400);
+            ]);
         }
         $student->password = Hash::make($request->newPassword);
         $student->save();

@@ -144,35 +144,27 @@ class ClassroomController extends Controller
 
     function updateStudentListByClassroom(string $id, Request $request)
     {
-        try {
-            $classroom = Classroom::find($id);
-            if (!$classroom) {
-                return response()->json([
-                    'success' => 0,
-                    'message' => 'Classroom information not found',
-                    'data' => []
-                ], 400);
-            }
-            $classroom->registeredStudents()->sync($request->students);
-            $lecturer = $classroom->lecturer->only(['code', 'fullname']);
-            $students = $classroom->registeredStudents()->get();
-            $students = $students->map(function ($student) {
-                return $student->only(['id', 'code', 'famMidName', 'name', 'gender']);
-            });
-            return response()->json([
-                'success' => 1,
-                'message' => 'Update student list successfully',
-                'data' => ['classroom' => [
-                    'lecture' => $lecturer,
-                    'term' => $classroom->term,
-                    'students' => $students
-                ]]], 200);
-        } catch (\Exception $e) {
+        $classroom = Classroom::find($id);
+        if (!$classroom) {
             return response()->json([
                 'success' => 0,
-                'message' => $e->getMessage(),
-                'errorCode' => $e->getCode(),
+                'message' => 'Classroom information not found',
+                'data' => []
             ], 400);
         }
+        $classroom->registeredStudents()->sync($request->students);
+        $lecturer = $classroom->lecturer->only(['code', 'fullname']);
+        $students = $classroom->registeredStudents()->get();
+        $students = $students->map(function ($student) {
+            return $student->only(['id', 'code', 'famMidName', 'name', 'gender']);
+        });
+        return response()->json([
+            'success' => 1,
+            'message' => 'Update student list successfully',
+            'data' => ['classroom' => [
+                'lecture' => $lecturer,
+                'term' => $classroom->term,
+                'students' => $students
+            ]]], 200);
     }
 }

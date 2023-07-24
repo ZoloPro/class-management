@@ -85,7 +85,7 @@ class DocumentController extends Controller
                 'message' => 'Document does not exist',
                 'data' => []], 400);
         }
-        Storage::disk('azure')->delete('Lập trình cơ bản_3/1689787778_scribd.vpdfs.com_de-cuong-on-tap-thi-cuoi-ky-oop-lap-trinh-huong-doi-tuong-uit.pdf');
+        Storage::disk('azure')->delete($document->path);
         $document->delete();
         return response()->json([
             'success' => 1,
