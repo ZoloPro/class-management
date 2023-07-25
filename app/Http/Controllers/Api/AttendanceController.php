@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AttendanceHistory;
 use App\Models\Classroom;
 use App\Models\WifiInfo;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -34,7 +34,7 @@ class AttendanceController extends Controller
     public function checkIn(Request $request)
     {
         $key = env('ATTENDANCE_JWT_SECRET');
-        $token = $request->query('token');
+        $token = $request->token;
         if (!$token) {
             return response()->json([
                 'successs' => 0,
@@ -80,10 +80,10 @@ class AttendanceController extends Controller
                 'message' => 'Check in successfully',
                 'data' => []
             ], 200);
-        } catch (\Firebase\JWT\ExpiredException $exception) {
+        } catch (\Exception $exception) {
             return response()->json([
-                'successs' => 0,
-                'message' => 'Link has expired',
+                'success' => 0,
+                'message' => 'Token has expired',
                 'data' => [],
             ], 200);
         }
@@ -91,8 +91,18 @@ class AttendanceController extends Controller
 
     public function logAttendance(string $classroomId)
     {
-        $lecturer = auth('lecturerToken')->user();
-        $classrooms = $lecturer->classrooms()->find($classroomId);
+        $lecturer = auth()->user();
+        $attendanceHistory = AttendanceHistory::firstOrCreate([
+            'classroomId' => $classroomId,
+            'date' => date('Y-m-d'),
+        ]);
+        return response()->json([
+            'success' => 1,
+            'message' => 'Log attendance successfully',
+            'data' => [
+                'attendanceHistory' => $attendanceHistory
+            ]
+        ], 200);
     }
 
 }

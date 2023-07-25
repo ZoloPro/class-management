@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class StudentAuth extends Controller
 {
@@ -89,8 +90,14 @@ class StudentAuth extends Controller
     {
         $validator = Validator::make($request->all(), [
             'oldPassword' => 'required',
-            'newPassword' => 'required|min:8|max:20',
+            'newPassword' => ['required', 'different:oldPassword', 'max:20', Password::min(6)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+                ->symbols()],
             'confirmPassword' => 'required|same:newPassword',
+        ], [
+
         ]);
         if ($validator->stopOnFirstFailure()->fails()) {
             return response()->json([

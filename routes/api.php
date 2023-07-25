@@ -84,11 +84,12 @@ Route::prefix('/lecturer')->group(function () {
         Route::delete('/documents/{classroomId}', [Api\DocumentController::class, 'destroy']);
 
         Route::get('/attendance/{classroomId}', [Api\AttendanceController::class, 'generateAttendanceToken'])->middleware(EnsureClassroomOwner::class);
+        Route::post('/attendance/{classroomId}', [Api\AttendanceController::class, 'logAttendance'])->middleware(EnsureClassroomOwner::class);
 
         Route::post('/password', [Api\LecturerAuth::class, 'changePassword']);
 
         Route::get('/grades/{classroomId}', [Api\LecturerController::class, 'getGradesByClassroom'])->middleware(EnsureClassroomOwner::class);
-        Route::put('/grades/{classroomId}', [Api\GradeController::class, 'undateGrade'])->middleware(EnsureClassroomOwner::class);
+        Route::put('/grades/{classroomId}', [Api\GradeController::class, 'updateGrade'])->middleware(EnsureClassroomOwner::class);
     });
 });
 
