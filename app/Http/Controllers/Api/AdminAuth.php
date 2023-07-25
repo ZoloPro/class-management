@@ -64,7 +64,7 @@ class AdminAuth extends Controller
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data of logged in account successfully',
-                'data' => ['user' => Auth::guard()->user()]]);
+                'data' => ['user' => Auth::user()]]);
         }
     }
 

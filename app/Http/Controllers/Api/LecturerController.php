@@ -192,36 +192,30 @@ class LecturerController extends Controller
 
     public function getGradesByClassroom(Request $request)
     {
-        try {
-            $lecturer = Auth::user();
-            $classroom = $lecturer->classrooms()->find($request->classroomId);
-            $studetns = $classroom->registeredStudents;
-            $gradeList = $studetns->map(function ($student) use ($request) {
-                $grade = $student->hasGrades()->find($request->classroomId);
-                $studentGrade = $grade ? $grade->grade->grade : null;
-                return [
-                    'code' => $student->code,
-                    'famMidName' => $student->famMidName,
-                    'name' => $student->name,
-                    'gender' => $student->gender,
-                    'grade' => $studentGrade,
-                ];
-            });
-            return response()->json([
-                'status' => 1,
-                'message' => 'Get data successfully',
-                'gradeList' => $gradeList,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 0,
-                'message' => $e->getMessage(),
-                'errorCode' => $e->getCode(),
-            ], 400);
-        }
+        $lecturer = Auth::user();
+        $classroom = $lecturer->classrooms()->find($request->classroomId);
+        $students = $classroom->registeredStudents;
+        $gradeList = $students->map(function ($student) use ($request) {
+            $grade = $student->hasGrades()->find($request->classroomId);
+            $studentGrade = $grade ? $grade->grade->grade : null;
+            return [
+                'id' => $student->id,
+                'code' => $student->code,
+                'famMidName' => $student->famMidName,
+                'name' => $student->name,
+                'gender' => $student->gender,
+                'grade' => $studentGrade,
+            ];
+        });
+        return response()->json([
+            'success' => 1,
+            'message' => 'Get data successfully',
+            'data' => ['gradeList' => $gradeList],
+        ], 200);
     }
 
-    public function downloadExampleImportFile()
+    public
+    function downloadExampleImportFile()
     {
         $file = storage_path("app/public/example/example-lecturers.xlsx");
         $headers = [

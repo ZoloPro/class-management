@@ -30,7 +30,12 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception)
     {
-        if ($exception->getCode() == 23000) {
+        if ($exception instanceof ModelNotFoundException) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Entry for ' . str_replace('App\\', '', $exception->getModel()) . ' not found'], 404);
+
+        } else if ($exception->getCode() == 23000) {
             return response()->json([
                 'susscess' => 0,
                 'message' => 'Foreign Key Constraint Violation',

@@ -63,7 +63,7 @@ class LecturerAuth extends Controller
      */
     public function me()
     {
-        if (Auth::guard('lecturerToken')->user()) {
+        if (Auth::user()) {
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data of logged in account successfully',
@@ -101,7 +101,7 @@ class LecturerAuth extends Controller
                 'data' => $validator->errors()
             ], 400);
         }
-        $lecuturer = Auth::guard('lecturerToken') -> user();
+        $lecuturer = Auth::user();
         if (!Hash::check($request->oldPassword, $lecuturer->password)) {
             return response()->json([
                 'success' => 0,

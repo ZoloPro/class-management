@@ -18,7 +18,6 @@ use App\Http\Controllers\Api;
 Route::prefix('/admin')->group(function () {
     Route::post('/login', [Api\AdminAuth::class, 'login']);
 
-
     Route::middleware('auth:adminToken')->group(function () {
         Route::prefix('/import')->group(function () {
             Route::post('/lecturers', [Api\LecturerController::class, 'import']);
@@ -84,9 +83,12 @@ Route::prefix('/lecturer')->group(function () {
         Route::post('/documents/{classroomId}', [Api\DocumentController::class, 'uploadFile']);
         Route::delete('/documents/{classroomId}', [Api\DocumentController::class, 'destroy']);
 
-        Route::get('/attendance/{classroomId}', [Api\AttendanceController::class, 'generateAttendanceLink'])->middleware(EnsureClassroomOwner::class);
+        Route::get('/attendance/{classroomId}', [Api\AttendanceController::class, 'generateAttendanceToken'])->middleware(EnsureClassroomOwner::class);
 
         Route::post('/password', [Api\LecturerAuth::class, 'changePassword']);
+
+        Route::get('/grades/{classroomId}', [Api\LecturerController::class, 'getGradesByClassroom'])->middleware(EnsureClassroomOwner::class);
+        Route::put('/grades/{classroomId}', [Api\GradeController::class, 'undateGrade'])->middleware(EnsureClassroomOwner::class);
     });
 });
 

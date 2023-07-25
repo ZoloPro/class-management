@@ -24,7 +24,7 @@ class DocumentController extends Controller
                 'data' => []], 400);
         }
 
-        $lecturer = Auth::guard('lecturerToken')->user();
+        $lecturer = Auth::user();
         $classroom = $lecturer->classrooms()->find($request->classroomId);
         if (!$classroom) {
             return response()->json([
@@ -57,7 +57,7 @@ class DocumentController extends Controller
     public function getDocumentsByClassLecturer(Request $request)
     {
 
-        $lecturer = Auth::guard('lecturerToken')->user();
+        $lecturer = Auth::user();
         $classroom = $lecturer->classrooms()->find($request->classroomId);
         if (!$classroom) {
             return response()->json([
@@ -77,7 +77,7 @@ class DocumentController extends Controller
 
     public function destroy(string $classroomId)
     {
-        $lecturer = Auth::guard('lecturerToken')->user();
+        $lecturer = Auth::user();
         $document = $lecturer->documents()->find($classroomId);
         if (!$document) {
             return response()->json([

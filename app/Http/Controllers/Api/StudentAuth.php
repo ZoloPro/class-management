@@ -20,8 +20,8 @@ class StudentAuth extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'code' => 'required|string|min:8|max:8|exists:student,code',
-            'password' => 'required|string|min:8|max:20'
+            'code' => 'required|string|exists:student,code',
+            'password' => 'required|string'
         ], [
             'code.exists' => 'Student code does not exist'
         ]);
@@ -89,7 +89,7 @@ class StudentAuth extends Controller
     {
         $validator = Validator::make($request->all(), [
             'oldPassword' => 'required',
-            'newPassword' => 'required',
+            'newPassword' => 'required|min:8|max:20',
             'confirmPassword' => 'required|same:newPassword',
         ]);
         if ($validator->stopOnFirstFailure()->fails()) {

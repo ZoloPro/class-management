@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
-    public function generateAttendanceLink(Request $request)
+    public function generateAttendanceToken(Request $request)
     {
         $key = env('ATTENDANCE_JWT_SECRET');
         $payload = [
@@ -25,7 +25,8 @@ class AttendanceController extends Controller
             'success' => 1,
             'message' => 'Generate successfully',
             'data' => [
-                'url' => "{$_SERVER['SERVER_NAME']}:{$_SERVER['SERVER_PORT']}/api/student/checkin?token={$token}",
+                'classroomId' => $request->classroomId,
+                'token' => $token,
             ]
         ], 200);
     }
