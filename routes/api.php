@@ -66,6 +66,7 @@ Route::prefix('/student')->group(function () {
         Route::post('/grade-list', [Api\StudentController::class, 'getGradesOfClassroom'])->middleware(EnsureInClassroom::class);
         Route::post('/password', [Api\StudentAuth::class, 'changePassword']);
         Route::post('/checkin', [Api\CheckinController::class, 'checkIn']);
+        Route::get('/checkin-history', [Api\CheckinController::class, 'getCheckinHistoryByStudent']);
 
     });
 });

@@ -81,13 +81,7 @@ class CheckinController extends Controller
             return response()->json([
                 'success' => 0,
                 'message' => 'You have already checked in',
-                'data' => [
-                    'classroom' => [
-                        'id' => $classroom->id,
-                        'term' => $classroom->term,
-                    ],
-                    'date' => $isCheckIn->checkin->date,
-                ],
+                'data' => [],
             ], 200);
         }
         $date = date('Y-m-d');
@@ -95,13 +89,7 @@ class CheckinController extends Controller
         return response()->json([
             'success' => 1,
             'message' => 'Check in successfully',
-            'data' => [
-                'classroom' => [
-                    'id' => $classroom->id,
-                    'term' => $classroom->term,
-                ],
-                'date' => $date
-            ]
+            'data' => []
         ], 200);
     }
 
@@ -133,7 +121,6 @@ class CheckinController extends Controller
             ->where('date', '>=', $from)
             ->where('date', '<=', $to)
             ->get();
-//        dd($checkinHistories);
         $checkedInList = $students->map(function ($student) use ($checkinHistories) {
             return [
                 'id' => $student->id,
@@ -144,7 +131,7 @@ class CheckinController extends Controller
                     $checkinHistories->map(function ($checkinHistory) use ($student) {
                         return [
                             'date' => $checkinHistory->date,
-                            'isChecked' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
+                            'isChecked ' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
                     })
                 ]
             ];
@@ -154,6 +141,34 @@ class CheckinController extends Controller
             'message' => 'Get checked in list successfully',
             'data' => [
                 'checkedInList' => $checkedInList
+            ]
+        ], 200);
+    }
+
+    function getCheckinHistoryByStudent()
+    {
+        $student = auth()->user();
+        $classrooms = $student->registeredClassrooms;
+        $checkinHistory = $classrooms->map(function ($classroom) use ($student) {
+            return [
+                'classroom' => [
+                    ['classroomId' => $classroom->id],
+                    ['term' => $classroom->term]
+                ],
+                'checkinDate' => [
+                    $classroom->checkinHistory->map(function ($checkinHistory) use ($student) {
+                        return [
+                            'date' => $checkinHistory->date,
+                            'isChecked ' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
+                    })
+                ]
+            ];
+        });
+        return response()->json([
+            'success' => 1,
+            'message' => 'Get checked in list successfully',
+            'data' => [
+                'checkedInList' => $checkinHistory,
             ]
         ], 200);
     }
