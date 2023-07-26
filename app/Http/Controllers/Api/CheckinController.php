@@ -47,7 +47,8 @@ class CheckinController extends Controller
             return $wifiInfo->only(['wifiName', 'wifiBSSID']);
         })->toArray();
         $requestWifi = $request->only(['wifiName', 'wifiBSSID']);
-//        dd($requestWifi, $wifiInfos);
+        $output = new \Symfony\Component\Console\Output\ConsoleOutput();
+        $output->writeln($requestWifi);
         if (!in_array($requestWifi, $wifiInfos)) {
             return response()->json([
                 'success' => 0,
