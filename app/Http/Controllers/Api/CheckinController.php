@@ -48,7 +48,7 @@ class CheckinController extends Controller
         })->toArray();
         $requestWifi = $request->only(['wifiName', 'wifiBSSID']);
         $output = new \Symfony\Component\Console\Output\ConsoleOutput();
-        $output->writeln($requestWifi);
+        $output->writeln($request);
         if (!in_array($requestWifi, $wifiInfos)) {
             return response()->json([
                 'success' => 0,
@@ -106,5 +106,35 @@ class CheckinController extends Controller
             ]
         ], 200);
     }
+
+    /* public function getCheckinHistory(Request $request)
+     {
+         $classroomId = $request->classroomId;
+         $from = $request->query('from');
+         $to = $request->query('to');
+
+         $classroom = Classroom::find($classroomId);
+         $students = $classroom->students;
+         $checkinHistories = CheckinHistory::where('classroomId', $classroomId)
+             ->where('date', '>=', $from)
+             ->where('date', '<=', $to)
+             ->get();
+         $checkedInList = $students->map(function ($student) {
+            return [
+                 'id' => $student->id,
+                 'code' => $student->code,
+                 'fullname' => $student->name,
+                 'checkedIn' => false,
+               ];
+            ]
+         });
+         return response()->json([
+             'success' => 1,
+             'message' => 'Get checkin history successfully',
+             'data' => [
+                 'checkinHistories' => $checkinHistories
+             ]
+         ], 200);
+     }*/
 
 }
