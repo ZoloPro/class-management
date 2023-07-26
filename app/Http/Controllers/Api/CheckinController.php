@@ -121,34 +121,41 @@ class CheckinController extends Controller
         ], 200);
     }
 
-    /* public function getCheckinHistory(Request $request)
-     {
-         $classroomId = $request->classroomId;
-         $from = $request->query('from');
-         $to = $request->query('to');
+    public function getCheckinHistory(Request $request)
+    {
+        $classroomId = $request->classroomId;
+        $from = $request->query('from');
+        $to = $request->query('to');
 
-         $classroom = Classroom::find($classroomId);
-         $students = $classroom->students;
-         $checkinHistories = CheckinHistory::where('classroomId', $classroomId)
-             ->where('date', '>=', $from)
-             ->where('date', '<=', $to)
-             ->get();
-         $checkedInList = $students->map(function ($student) {
+        $classroom = Classroom::find($classroomId);
+        $students = $classroom->students;
+        $checkinHistories = CheckinHistory::where('classroomId', $classroomId)
+            ->where('date', '>=', $from)
+            ->where('date', '<=', $to)
+            ->get();
+//        dd($checkinHistories);
+        $checkedInList = $students->map(function ($student) use ($checkinHistories) {
             return [
-                 'id' => $student->id,
-                 'code' => $student->code,
-                 'fullname' => $student->name,
-                 'checkedIn' => false,
-               ];
+                'id' => $student->id,
+                'code' => $student->code,
+                'famMidName' => $student->famMidName,
+                'name' => $student->name,
+                'checkedInDate' => [
+                    $checkinHistories->map(function ($checkinHistory) use ($student) {
+                        return [
+                            'date' => $checkinHistory->date,
+                            'isChecked' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
+                    })
+                ]
+            ];
+        });
+        return response()->json([
+            'success' => 1,
+            'message' => 'Get checked in list successfully',
+            'data' => [
+                'checkedInList' => $checkedInList
             ]
-         });
-         return response()->json([
-             'success' => 1,
-             'message' => 'Get checkin history successfully',
-             'data' => [
-                 'checkinHistories' => $checkinHistories
-             ]
-         ], 200);
-     }*/
+        ], 200);
+    }
 
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureClassroomOwner;
+use App\Http\Middleware\EnsureInClassroom;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api;
 
@@ -62,6 +63,7 @@ Route::prefix('/student')->group(function () {
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
         Route::post('/detail/', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/grade', [Api\StudentController::class, 'getGradesByLoggedStudent']);
+        Route::post('/grade-list', [Api\StudentController::class, 'getGradesOfClassroom'])->middleware(EnsureInClassroom::class);
         Route::post('/password', [Api\StudentAuth::class, 'changePassword']);
         Route::post('/checkin', [Api\CheckinController::class, 'checkIn']);
 
@@ -85,6 +87,7 @@ Route::prefix('/lecturer')->group(function () {
 
         Route::get('/checkin/{classroomId}', [Api\CheckinController::class, 'generateCheckinToken'])->middleware(EnsureClassroomOwner::class);
         Route::post('/checkin/{classroomId}', [Api\CheckinController::class, 'logCheckin'])->middleware(EnsureClassroomOwner::class);
+        Route::get('/checkin/{classroomId}/history', [Api\CheckinController::class, 'getCheckinHistory'])->middleware(EnsureClassroomOwner::class);
 
         Route::post('/password', [Api\LecturerAuth::class, 'changePassword']);
 

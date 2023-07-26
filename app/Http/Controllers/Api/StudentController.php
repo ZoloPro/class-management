@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Import\StudentsImport;
+use App\Models\Classroom;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -309,6 +310,24 @@ class StudentController extends Controller
                 'errorCode' => $e->getCode(),
             ], 400);
         }
+    }
+
+    public function getGradesOfClassroom(Request $request)
+    {
+        $classromId = $request->classroomId;
+        $classroom = Classroom::find($classromId);
+        $gradeList = $classroom->hasGrades;
+        $gradeList = $gradeList->map(function ($grade) {
+            return $grade->grade->grade;
+        });
+
+        return response()->json([
+            'success' => 1,
+            'message' => 'Get data successfully',
+            'data' => [
+                'gradeList' => $gradeList
+            ]
+        ], 200);
     }
 
     public function downloadExampleImportFile()
