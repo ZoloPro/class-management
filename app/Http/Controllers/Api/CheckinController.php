@@ -47,8 +47,6 @@ class CheckinController extends Controller
             return $wifiInfo->only(['wifiName', 'wifiBSSID']);
         })->toArray();
         $requestWifi = $request->only(['wifiName', 'wifiBSSID']);
-        $output = new \Symfony\Component\Console\Output\ConsoleOutput();
-        $output->writeln($request);
         if (!in_array($requestWifi, $wifiInfos)) {
             return response()->json([
                 'success' => 0,
@@ -56,32 +54,11 @@ class CheckinController extends Controller
                 'data' => []
             ], 200);
         }
+
         try {
             $decode = JWT::decode($token, new Key($key, 'HS256'));
             $classroom = Classroom::find($decode->classroomId);
-            $student = Auth::user();
-            $student = $classroom->students()->find($student->id);
-            if (!$student) {
-                return response()->json([
-                    'success' => 0,
-                    'message' => 'Students not in class',
-                    'data' => []
-                ], 200);
-            }
-            $isCheckIn = $classroom->checkedInStudents()->where('studentId', $student->id)->wherePivot('date', date('Y-m-d'))->first();
-            if ($isCheckIn) {
-                return response()->json([
-                    'success' => 0,
-                    'message' => 'You have already checked in',
-                    'data' => []
-                ], 200);
-            }
-            $classroom->checkedInStudents()->attach($student, ['date' => date('Y-m-d')]);
-            return response()->json([
-                'success' => 1,
-                'message' => 'Check in successfully',
-                'data' => []
-            ], 200);
+
         } catch (\Exception $exception) {
             return response()->json([
                 'success' => 0,
@@ -89,6 +66,43 @@ class CheckinController extends Controller
                 'data' => [],
             ], 200);
         }
+
+        $student = Auth::user();
+        $student = $classroom->students()->find($student->id);
+        if (!$student) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Students not in class',
+                'data' => []
+            ], 200);
+        }
+        $isCheckIn = $classroom->checkedInStudents()->where('studentId', $student->id)->wherePivot('date', date('Y-m-d'))->first();
+        if ($isCheckIn) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'You have already checked in',
+                'data' => [
+                    'classroom' => [
+                        'id' => $classroom->id,
+                        'term' => $classroom->term,
+                    ],
+                    'date' => $isCheckIn->checkin->date,
+                ],
+            ], 200);
+        }
+        $date = date('Y-m-d');
+        $classroom->checkedInStudents()->attach($student, ['date' => $date]);
+        return response()->json([
+            'success' => 1,
+            'message' => 'Check in successfully',
+            'data' => [
+                'classroom' => [
+                    'id' => $classroom->id,
+                    'term' => $classroom->term,
+                ],
+                'date' => $date
+            ]
+        ], 200);
     }
 
     public function logCheckin(string $classroomId)
