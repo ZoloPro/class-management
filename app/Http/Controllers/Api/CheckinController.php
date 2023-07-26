@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AttendanceHistory;
+use App\Models\CheckinHistory;
 use App\Models\Classroom;
 use App\Models\WifiInfo;
 use Illuminate\Http\Request;
@@ -11,9 +11,9 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Auth;
 
-class AttendanceController extends Controller
+class CheckinController extends Controller
 {
-    public function generateAttendanceToken(Request $request)
+    public function generateCheckinToken(Request $request)
     {
         $key = env('ATTENDANCE_JWT_SECRET');
         $payload = [
@@ -37,16 +37,17 @@ class AttendanceController extends Controller
         $token = $request->token;
         if (!$token) {
             return response()->json([
-                'successs' => 0,
+                'success' => 0,
                 'message' => 'Link has expired',
                 'data' => [],
             ], 200);
         }
         $wifiInfos = WifiInfo::all();
         $wifiInfos = $wifiInfos->map(function ($wifiInfo) {
-            return $wifiInfo->only(['wifiName', 'wifiBSSID', 'wifiIP']);
+            return $wifiInfo->only(['wifiName', 'wifiBSSID']);
         })->toArray();
-        $requestWifi = $request->only(['wifiName', 'wifiBSSID', 'wifiIP']);
+        $requestWifi = $request->only(['wifiName', 'wifiBSSID']);
+//        dd($requestWifi, $wifiInfos);
         if (!in_array($requestWifi, $wifiInfos)) {
             return response()->json([
                 'success' => 0,
@@ -66,7 +67,7 @@ class AttendanceController extends Controller
                     'data' => []
                 ], 200);
             }
-            $isCheckIn = $classroom->attendedStudents()->where('studentId', $student->id)->wherePivot('date', date('Y-m-d'))->first();
+            $isCheckIn = $classroom->checkedInStudents()->where('studentId', $student->id)->wherePivot('date', date('Y-m-d'))->first();
             if ($isCheckIn) {
                 return response()->json([
                     'success' => 0,
@@ -74,7 +75,7 @@ class AttendanceController extends Controller
                     'data' => []
                 ], 200);
             }
-            $classroom->attendedStudents()->attach($student, ['date' => date('Y-m-d')]);
+            $classroom->checkedInStudents()->attach($student, ['date' => date('Y-m-d')]);
             return response()->json([
                 'success' => 1,
                 'message' => 'Check in successfully',
@@ -89,18 +90,18 @@ class AttendanceController extends Controller
         }
     }
 
-    public function logAttendance(string $classroomId)
+    public function logCheckin(string $classroomId)
     {
         $lecturer = auth()->user();
-        $attendanceHistory = AttendanceHistory::firstOrCreate([
+        $checkinHistory = CheckinHistory::firstOrCreate([
             'classroomId' => $classroomId,
             'date' => date('Y-m-d'),
         ]);
         return response()->json([
             'success' => 1,
-            'message' => 'Log attendance successfully',
+            'message' => 'Log checkin successfully',
             'data' => [
-                'attendanceHistory' => $attendanceHistory
+                'checkinHistory' => $checkinHistory
             ]
         ], 200);
     }

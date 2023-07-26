@@ -40,14 +40,14 @@ class Student extends Authenticatable
         )->as('registerClassroom');
     }
 
-    public function attendedClassrooms(): BelongsToMany
+    public function checkinClassrooms(): BelongsToMany
     {
         return $this->belongsToMany(
             Classroom::class,
-            'attendance',
+            'checkin',
             'studentId',
             'classroomId',
-        )->withPivot('date')->as('attendance');
+        )->withPivot('date')->as('checkin');
     }
 
     public function hasGrades(): BelongsToMany

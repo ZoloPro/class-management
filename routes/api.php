@@ -63,7 +63,7 @@ Route::prefix('/student')->group(function () {
         Route::post('/detail/', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/grade', [Api\StudentController::class, 'getGradesByLoggedStudent']);
         Route::post('/password', [Api\StudentAuth::class, 'changePassword']);
-        Route::post('/checkin', [Api\AttendanceController::class, 'checkIn']);
+        Route::post('/checkin', [Api\CheckinController::class, 'checkIn']);
 
     });
 });
@@ -83,8 +83,8 @@ Route::prefix('/lecturer')->group(function () {
         Route::post('/documents/{classroomId}', [Api\DocumentController::class, 'uploadFile']);
         Route::delete('/documents/{classroomId}', [Api\DocumentController::class, 'destroy']);
 
-        Route::get('/attendance/{classroomId}', [Api\AttendanceController::class, 'generateAttendanceToken'])->middleware(EnsureClassroomOwner::class);
-        Route::post('/attendance/{classroomId}', [Api\AttendanceController::class, 'logAttendance'])->middleware(EnsureClassroomOwner::class);
+        Route::get('/checkin/{classroomId}', [Api\CheckinController::class, 'generateCheckinToken'])->middleware(EnsureClassroomOwner::class);
+        Route::post('/checkin/{classroomId}', [Api\CheckinController::class, 'logCheckin'])->middleware(EnsureClassroomOwner::class);
 
         Route::post('/password', [Api\LecturerAuth::class, 'changePassword']);
 
@@ -94,7 +94,7 @@ Route::prefix('/lecturer')->group(function () {
 });
 
 //
-//Route::post('/attendance', [Api\AttendanceController::class, 'attend']);
+//Route::post('/attendance', [Api\CheckinController::class, 'attend']);
 
 Route::fallback(function () {
     return response()->json([

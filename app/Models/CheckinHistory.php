@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AttendanceHistory extends Model
+class CheckinHistory extends Model
 {
     use HasFactory;
 
-    protected $table = 'attendanceHistory';
+    protected $table = 'checkin_history';
 
     protected $primaryKey = 'id';
 

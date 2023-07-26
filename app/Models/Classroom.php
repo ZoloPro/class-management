@@ -42,14 +42,14 @@ class Classroom extends Model
         )->as('registerClassroom');
     }
 
-    public function attendedStudents(): BelongsToMany
+    public function checkedInStudents(): BelongsToMany
     {
         return $this->belongsToMany(
             Student::class,
-            'attendance',
+            'checkin',
             'classroomId',
             'studentId',
-        )->withPivot('date')->as('attendance');
+        )->withPivot('date')->as('checkin');
     }
 
     public function hasGrades(): BelongsToMany
@@ -77,9 +77,9 @@ class Classroom extends Model
         return $this->hasMany(Document::class, 'classroomId');
     }
 
-    public function attendanceHistory(): HasMany
+    public function checkinHistory(): HasMany
     {
-        return $this->hasMany(AttendanceHistory::class, 'classroomId');
+        return $this->hasMany(CheckinHistory::class, 'classroomId');
     }
 
     public function wifiInfo(): HasOne
