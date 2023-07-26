@@ -127,7 +127,7 @@ class CheckinController extends Controller
                 'code' => $student->code,
                 'famMidName' => $student->famMidName,
                 'name' => $student->name,
-                'checkedInDate' => [
+                'checkedIn' => [
                     $checkinHistories->map(function ($checkinHistory) use ($student) {
                         return [
                             'date' => $checkinHistory->date,
@@ -140,7 +140,10 @@ class CheckinController extends Controller
             'success' => 1,
             'message' => 'Get checked in list successfully',
             'data' => [
-                'checkedInList' => $checkedInList
+                'checkinHistory' => [
+                    'dates' => $checkinHistories->pluck('date'),
+                    'checkedInList' => $checkedInList,
+                ]
             ]
         ], 200);
     }
@@ -152,7 +155,7 @@ class CheckinController extends Controller
         $checkinHistory = $classrooms->map(function ($classroom) use ($student) {
             return [
                 'classroom' => [
-                    'classroomId' => $classroom->id,
+                    'id' => $classroom->id,
                     'term' => $classroom->term,
                     'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
                 ],
