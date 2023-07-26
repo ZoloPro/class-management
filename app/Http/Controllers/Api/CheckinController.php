@@ -152,16 +152,16 @@ class CheckinController extends Controller
         $checkinHistory = $classrooms->map(function ($classroom) use ($student) {
             return [
                 'classroom' => [
-                    ['classroomId' => $classroom->id],
-                    ['term' => $classroom->term]
+                    'classroomId' => $classroom->id,
+                    'term' => $classroom->term,
+                    'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
                 ],
-                'checkinDate' => [
-                    $classroom->checkinHistory->map(function ($checkinHistory) use ($student) {
-                        return [
-                            'date' => $checkinHistory->date,
-                            'isChecked ' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
-                    })
-                ]
+                'checkinDate' => $classroom->checkinHistory->map(function ($checkinHistory) use ($student) {
+                    return [
+                        'date' => $checkinHistory->date,
+                        'isChecked ' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
+                })
+
             ];
         });
         return response()->json([
