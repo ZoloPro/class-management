@@ -189,7 +189,11 @@ class LecturerController extends Controller
         $students = $classroom->registeredStudents;
         $gradeList = $students->map(function ($student) use ($request) {
             $grade = $student->hasGrades()->find($request->classroomId);
-            $studentGrade = $grade ? $grade->grade->grade : null;
+            $studentGrade = [
+                'attendanceGrade' => $grade ? $grade->grade->attendanceGrade : null,
+                'examGrade' => $grade ? $grade->grade->examGrade : null,
+                'finalGrade' => $grade ? $grade->grade->finalGrade : null,
+            ];
             return [
                 'id' => $student->id,
                 'code' => $student->code,

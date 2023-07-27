@@ -36,7 +36,6 @@ class LecturerAuth extends Controller
         $credentials = $request->only('code', 'password');
         if (Auth::guard('lecturer')->attempt($credentials)) {
             $user = Auth::guard('lecturer')->user();
-            $user->tokens()->delete();
             $token = $user->createToken('API Token')->plainTextToken;
 
             return response()->json([

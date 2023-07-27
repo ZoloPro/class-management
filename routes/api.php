@@ -61,7 +61,7 @@ Route::prefix('/student')->group(function () {
         Route::get('/logout', [Api\StudentAuth::class, 'logout']);
         Route::get('/me', [Api\StudentAuth::class, 'me']);
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
-        Route::post('/detail/', [Api\StudentController::class, 'getClassroomDetail']);
+        Route::post('/detail', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/grade', [Api\StudentController::class, 'getGradesByLoggedStudent']);
         Route::post('/grade-list', [Api\StudentController::class, 'getGradesOfClassroom'])->middleware(EnsureInClassroom::class);
         Route::post('/password', [Api\StudentAuth::class, 'changePassword']);
@@ -79,7 +79,6 @@ Route::prefix('/lecturer')->group(function () {
 
         Route::get('/me', [Api\LecturerAuth::class, 'me']);
         Route::get('/classrooms', [Api\LecturerController::class, 'getClassroomsByLoggedLecturer']);
-        Route::get('/classrooms/{classroomId}/mark', [Api\LecturerController::class, 'getMarksByClassroom']);
 //        Route::get('/classrooms/{classroomId}/attendance', [Api\StudentController::class, 'getMarksByLoggedStudent']);
 
         Route::get('/documents/{classroomId}', [Api\DocumentController::class, 'getDocumentsByClassLecturer']);
