@@ -57,6 +57,6 @@ class Student extends Authenticatable
             'grade',
             'studentId',
             'classroomId'
-        )->as('grade')->withPivot('grade');
+        )->as('grade')->withPivot(['attendanceGrade', 'examGrade', 'finalGrade']);
     }
 }

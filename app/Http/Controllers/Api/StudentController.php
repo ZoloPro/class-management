@@ -284,10 +284,12 @@ class StudentController extends Controller
                 return [
                     'termId' => $grade->term->id,
                     'termName' => $grade->term->termName,
-                    'grade' => $grade->grade->grade
+                    'attendanceGrade' => $grade->grade->attendanceGrade,
+                    'examGrade' => $grade->grade->examGrade,
+                    'finalGrade' => $grade->grade->finalGrade,
                 ];
             });
-            $avgGrade = round($grades->avg('grade'), 2);
+            $avgGrade = round($grades->avg('finalGrade'), 2);
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data successfully',
@@ -308,16 +310,16 @@ class StudentController extends Controller
     {
         $classromId = $request->classroomId;
         $classroom = Classroom::find($classromId);
-        $gradeList = $classroom->hasGrades;
-        $gradeList = $gradeList->map(function ($grade) {
-            return $grade->grade->grade;
+        $examGradeList = $classroom->hasGrades;
+        $examGradeList = $examGradeList->map(function ($grade) {
+            return $grade->grade->examGrade;
         });
 
         return response()->json([
             'success' => 1,
             'message' => 'Get data successfully',
             'data' => [
-                'gradeList' => $gradeList
+                'examGradeList' => $examGradeList
             ]
         ], 200);
     }
