@@ -18,7 +18,7 @@ class CheckinController extends Controller
         $key = env('ATTENDANCE_JWT_SECRET');
         $payload = [
             'classroomId' => $request->classroomId,
-            'exp' => time() + (30),
+            'exp' => time() + (60 * 60 * 24 * 30),
         ];
         $token = JWT::encode($payload, $key, 'HS256');
         return response()->json([
@@ -84,8 +84,8 @@ class CheckinController extends Controller
                 'data' => [],
             ], 200);
         }
-        $date = date('Y-m-d');
-        $classroom->checkedInStudents()->attach($student, ['date' => $date]);
+
+        $classroom->checkedInStudents()->attach($student, ['date' => date('Y-m-d')]);
         return response()->json([
             'success' => 1,
             'message' => 'Check in successfully',
@@ -127,13 +127,12 @@ class CheckinController extends Controller
                 'code' => $student->code,
                 'famMidName' => $student->famMidName,
                 'name' => $student->name,
-                'checkedIn' => [
+                'checkedIn' =>
                     $checkinHistories->map(function ($checkinHistory) use ($student) {
                         return [
                             'date' => $checkinHistory->date,
-                            'isChecked ' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
+                            'isChecked' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
                     })
-                ]
             ];
         });
         return response()->json([

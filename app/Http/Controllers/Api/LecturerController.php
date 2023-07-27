@@ -103,19 +103,11 @@ class LecturerController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            Lecturer::destroy($id);
-            return response()->json([
-                'status' => 0,
-                'message' => 'Deleted successfully',
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 0,
-                'message' => $e->getMessage(),
-                'errorCode' => $e->getCode(),
-            ], 400);
-        }
+        Lecturer::destroy($id);
+        return response()->json([
+            'status' => 0,
+            'message' => 'Deleted successfully',
+        ], 200);
     }
 
     /**

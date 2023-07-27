@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Classroom;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class ClassroomController extends Controller
@@ -151,6 +152,18 @@ class ClassroomController extends Controller
                 'message' => 'Classroom information not found',
                 'data' => []
             ], 400);
+        }
+        $requestStudents = $request->students;
+        foreach ($requestStudents as $requestStudent) {
+            $student = Student::find($requestStudent);
+            $hasSampTerm = $student->registeredClassrooms()->where('termId', $classroom->termId)->exists();
+            if ($hasSampTerm) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => 'Student ' . $student->code . ' has already registered this term',
+                    'data' => []
+                ], 400);
+            }
         }
         $classroom->registeredStudents()->sync($request->students);
         $lecturer = $classroom->lecturer->only(['code', 'fullname']);

@@ -117,20 +117,12 @@ class StudentController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            Student::destroy($id);
-            return response()->json([
-                'success' => 1,
-                'message' => 'Deleted successfully',
-                'data' => [],
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 0,
-                'message' => $e->getMessage(),
-                'errorCode' => $e->getCode(),
-            ], 400);
-        }
+        Student::destroy($id);
+        return response()->json([
+            'success' => 1,
+            'message' => 'Deleted successfully',
+            'data' => [],
+        ], 200);
     }
 
     public function import(Request $request)
