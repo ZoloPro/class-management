@@ -33,64 +33,73 @@ class CheckinController extends Controller
 
     public function checkIn(Request $request)
     {
-        $key = env('ATTENDANCE_JWT_SECRET');
-        $token = $request->token;
-        if (!$token) {
+        try {
+            $key = env('ATTENDANCE_JWT_SECRET');
+            $token = $request->token;
+            if (!$token) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => 'Link has expired',
+                    'data' => [],
+                ], 200);
+            }
+            $wifiInfos = WifiInfo::all();
+            $wifiInfos = $wifiInfos->map(function ($wifiInfo) {
+                return $wifiInfo->only(['wifiName', 'wifiBSSID']);
+            })->toArray();
+            $requestWifi = $request->only(['wifiName', 'wifiBSSID']);
+            if (!in_array($requestWifi, $wifiInfos)) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => 'Invalid wifi network',
+                    'data' => []
+                ], 200);
+            }
+
+            try {
+                $decode = JWT::decode($token, new Key($key, 'HS256'));
+                $classroom = Classroom::find($decode->classroomId);
+
+            } catch (\Exception $exception) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => 'Token has expired',
+                    'data' => [],
+                ], 200);
+            }
+
+            $student = Auth::user();
+            $student = $classroom->students()->find($student->id);
+            if (!$student) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => 'Students not in class',
+                    'data' => []
+                ], 200);
+            }
+            $isCheckIn = $classroom->checkedInStudents()->where('studentId', $student->id)->wherePivot('date', date('Y-m-d'))->first();
+            if ($isCheckIn) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => 'You have already checked in',
+                    'data' => [],
+                ], 200);
+            }
+
+            $classroom->checkedInStudents()->attach($student, ['date' => date('Y-m-d')]);
             return response()->json([
-                'success' => 0,
-                'message' => 'Link has expired',
-                'data' => [],
-            ], 200);
-        }
-        $wifiInfos = WifiInfo::all();
-        $wifiInfos = $wifiInfos->map(function ($wifiInfo) {
-            return $wifiInfo->only(['wifiName', 'wifiBSSID']);
-        })->toArray();
-        $requestWifi = $request->only(['wifiName', 'wifiBSSID']);
-        if (!in_array($requestWifi, $wifiInfos)) {
-            return response()->json([
-                'success' => 0,
-                'message' => 'Invalid wifi network',
+                'success' => 1,
+                'message' => 'Check in successfully',
                 'data' => []
             ], 200);
-        }
-
-        try {
-            $decode = JWT::decode($token, new Key($key, 'HS256'));
-            $classroom = Classroom::find($decode->classroomId);
-
         } catch (\Exception $exception) {
             return response()->json([
                 'success' => 0,
-                'message' => 'Token has expired',
-                'data' => [],
-            ], 200);
-        }
-
-        $student = Auth::user();
-        $student = $classroom->students()->find($student->id);
-        if (!$student) {
-            return response()->json([
-                'success' => 0,
-                'message' => 'Students not in class',
+                'message' => $exception . getMessage(),
                 'data' => []
             ], 200);
         }
-        $isCheckIn = $classroom->checkedInStudents()->where('studentId', $student->id)->wherePivot('date', date('Y-m-d'))->first();
-        if ($isCheckIn) {
-            return response()->json([
-                'success' => 0,
-                'message' => 'You have already checked in',
-                'data' => [],
-            ], 200);
-        }
 
-        $classroom->checkedInStudents()->attach($student, ['date' => date('Y-m-d')]);
-        return response()->json([
-            'success' => 1,
-            'message' => 'Check in successfully',
-            'data' => []
-        ], 200);
     }
 
     public function logCheckin(string $classroomId)

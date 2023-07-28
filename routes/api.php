@@ -51,6 +51,11 @@ Route::prefix('/admin')->group(function () {
         Route::delete('/classrooms/{id}', [Api\ClassroomController::class, 'destroy']);
         Route::get('/classrooms/{id}', [Api\ClassroomController::class, 'getStudentsByClassroom']);
         Route::put('/classrooms/{id}/student', [Api\ClassroomController::class, 'updateStudentListByClassroom']);
+
+        Route::get('/wifi-info', [Api\WifiInfoController::class, 'index']);
+        Route::post('/wifi-info', [Api\WifiInfoController::class, 'store']);
+        Route::delete('/wifi-info/{wifiInfoId}', [Api\WifiInfoController::class, 'destroy']);
+        Route::put('/wifi-info/{wifiInfoId}', [Api\WifiInfoController::class, 'edit']);
     });
 });
 
