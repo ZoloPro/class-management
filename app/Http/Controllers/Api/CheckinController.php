@@ -95,7 +95,7 @@ class CheckinController extends Controller
         } catch (\Exception $exception) {
             return response()->json([
                 'success' => 0,
-                'message' => $exception . getMessage(),
+                'message' => $exception.getMessage(),
                 'data' => []
             ], 200);
         }
