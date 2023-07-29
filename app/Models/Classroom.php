@@ -20,6 +20,8 @@ class Classroom extends Model
     protected $fillable = [
         'termId',
         'lecturerId',
+        'startDate',
+        'endDate',
     ];
 
     public function students(): BelongsToMany
@@ -49,7 +51,7 @@ class Classroom extends Model
             'checkin',
             'classroomId',
             'studentId',
-        )->withPivot('date')->as('checkin');
+        )->withTimestamps()->as('checkin');
     }
 
     public function hasGrades(): BelongsToMany

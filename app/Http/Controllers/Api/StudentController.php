@@ -46,7 +46,7 @@ class StudentController extends Controller
             // Save lecturer
             $student = Student::create($request->all());
             $student->code = '1' . str_pad($student->id, 7, '0', STR_PAD_LEFT);
-            $student->password = Hash::make(substr($student->code, -4));
+            $student->password = Hash::make('tksv' . substr($student->code, -4));
             $student->save();
             // Return Json Response
             return response()->json([

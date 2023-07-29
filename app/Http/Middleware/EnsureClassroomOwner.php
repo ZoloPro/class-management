@@ -26,6 +26,14 @@ class   EnsureClassroomOwner
                 'data' => [],
             ], 403);
         }
+        $curDate = date('Y-m-d');
+        if ($curDate < $classroom->startDate && $curDate > $classroom->endDate) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Class is out of time',
+                'data' => [],
+            ], 400);
+        }
         return $next($request);
     }
 }

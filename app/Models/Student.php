@@ -47,7 +47,7 @@ class Student extends Authenticatable
             'checkin',
             'studentId',
             'classroomId',
-        )->withPivot('date')->as('checkin');
+        )->withTimestamps()->as('checkin');
     }
 
     public function hasGrades(): BelongsToMany

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Checkin;
 use App\Models\CheckinHistory;
 use App\Models\Classroom;
 use App\Models\WifiInfo;
@@ -18,7 +19,7 @@ class CheckinController extends Controller
         $key = env('ATTENDANCE_JWT_SECRET');
         $payload = [
             'classroomId' => $request->classroomId,
-            'exp' => time() + (60 * 60 * 24 * 30),
+            'exp' => time() + 12,
         ];
         $token = JWT::encode($payload, $key, 'HS256');
         return response()->json([
@@ -59,7 +60,6 @@ class CheckinController extends Controller
             try {
                 $decode = JWT::decode($token, new Key($key, 'HS256'));
                 $classroom = Classroom::find($decode->classroomId);
-
             } catch (\Exception $exception) {
                 return response()->json([
                     'success' => 0,
@@ -77,25 +77,43 @@ class CheckinController extends Controller
                     'data' => []
                 ], 200);
             }
-            $isCheckIn = $classroom->checkedInStudents()->where('studentId', $student->id)->wherePivot('date', date('Y-m-d'))->first();
+            $isCheckIn = $classroom->checkedInStudents()->where('studentId', $student->id)->whereDate('checkin.created_at', date('Y-m-d'))->first();
             if ($isCheckIn) {
                 return response()->json([
                     'success' => 0,
                     'message' => 'You have already checked in',
-                    'data' => [],
+                    'data' => [
+                        'classroom' => [
+                            'id' => $classroom->id,
+                            'term' => $classroom->term,
+                            'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
+                        ],
+                        'checkinTime' => $isCheckIn->checkin->created_at
+                    ],
                 ], 200);
             }
 
-            $classroom->checkedInStudents()->attach($student, ['date' => date('Y-m-d')]);
+            $checkin = Checkin::create([
+                'classroomId' => $classroom->id,
+                'studentId' => $student->id,
+                'date' => date('Y-m-d'),
+            ]);
             return response()->json([
                 'success' => 1,
                 'message' => 'Check in successfully',
-                'data' => []
+                'data' => [
+                    'classroom' => [
+                        'id' => $classroom->id,
+                        'term' => $classroom->term,
+                        'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
+                    ],
+                    'checkinTime' => $checkin->created_at
+                ]
             ], 200);
         } catch (\Exception $exception) {
             return response()->json([
                 'success' => 0,
-                'message' => $exception.getMessage(),
+                'message' => $exception->getMessage(),
                 'data' => []
             ], 200);
         }
@@ -140,7 +158,7 @@ class CheckinController extends Controller
                     $checkinHistories->map(function ($checkinHistory) use ($student) {
                         return [
                             'date' => $checkinHistory->date,
-                            'isChecked' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
+                            'checked' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->checkin->created_at) ?: null];
                     })
             ];
         });
@@ -158,30 +176,36 @@ class CheckinController extends Controller
 
     function getCheckinHistoryByStudent()
     {
-        $student = auth()->user();
-        $classrooms = $student->registeredClassrooms;
-        $checkinHistory = $classrooms->map(function ($classroom) use ($student) {
-            return [
-                'classroom' => [
-                    'id' => $classroom->id,
-                    'term' => $classroom->term,
-                    'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
-                ],
-                'checkinDate' => $classroom->checkinHistory->map(function ($checkinHistory) use ($student) {
-                    return [
-                        'date' => $checkinHistory->date,
-                        'isChecked ' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
-                })
-
-            ];
-        });
-        return response()->json([
-            'success' => 1,
-            'message' => 'Get checked in list successfully',
-            'data' => [
-                'checkedInList' => $checkinHistory,
-            ]
-        ], 200);
+        try {
+            $student = auth()->user();
+            $classrooms = $student->registeredClassrooms;
+            $checkinHistory = $classrooms->map(function ($classroom) use ($student) {
+                return [
+                    'classroom' => [
+                        'id' => $classroom->id,
+                        'term' => $classroom->term,
+                        'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
+                    ],
+                    'checkinDate' => $classroom->checkinHistory()->orderByDesc('date')->get()->map(function ($checkinHistory) use ($student) {
+                        return [
+                            'date' => $checkinHistory->date,
+                            'isChecked ' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
+                    })
+                ];
+            });
+            return response()->json([
+                'success' => 1,
+                'message' => 'Get checked in list successfully',
+                'data' => [
+                    'checkedInList' => $checkinHistory,
+                ]
+            ], 200);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'success' => 0,
+                'message' => $exception->getMessage(),
+                'data' => []
+            ], 200);
+        }
     }
-
 }
