@@ -19,7 +19,7 @@ class CheckinController extends Controller
     public function generateCheckinToken(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|in:in,mid,out',
+            'type' => 'required|in:1,2,3',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -97,9 +97,10 @@ class CheckinController extends Controller
                 'type' => $decode->type,
                 'date' => date('Y-m-d'),
             ]);
+            $timeStr = date('d/m/y H:i:s');
             return response()->json([
                 'success' => 1,
-                'message' => 'Check in successfully',
+                'message' => `Check in successfully $classroom->term->termName at $timeStr`,
                 'data' => [
                     'classroom' => [
                         'id' => $classroom->id,
@@ -150,23 +151,31 @@ class CheckinController extends Controller
         $checkinHistories = CheckinHistory::where('classroomId', $classroomId)
             ->where('date', '>=', $from)
             ->where('date', '<=', $to)
+            ->orderBy('date')
+            ->orderBy('time')
             ->get();
         $checkedInList = $students->map(function ($student) use ($checkinHistories) {
+            $checkedIn = $checkinHistories->map(function ($checkinHistory) use ($student) {
+                if ($checkinHistory->time == 0) {
+                    $time = 0;
+                    $checked = $student->checkins()->whereDate('created_at', $checkinHistory->date)->whereTime('created_at', '<', '12:00')->orderByDesc('created_at')->first(['type', 'created_at']);
+                } else {
+                    $time = 1;
+                    $checked = $student->checkins()->whereDate('created_at', $checkinHistory->date)->whereTime('created_at', '>', '12:00')->orderByDesc('created_at')->first(['type', 'created_at']);
+                }
+                return [
+                    'date' => $checkinHistory->date,
+                    'time' => $time,
+                    'checked' => $checked,
+                ];
+            });
             return [
                 'id' => $student->id,
                 'code' => $student->code,
                 'famMidName' => $student->famMidName,
                 'name' => $student->name,
-                'checkedIn' =>
-                    $checkinHistories->map(function ($checkinHistory) use ($student) {
-                        $checks = $student->checkins()->whereDate('created_at', $checkinHistory->date)->orderBy('created_at')->get(['type', 'created_at']);
-                        return [
-                            'date' => $checkinHistory->date,
-                            'checked' => $checks
-                        ];
-                    })
+                'checkedIn' => $checkedIn,
             ];
-
         });
         return response()->json([
             'success' => 1,
@@ -201,8 +210,6 @@ class CheckinController extends Controller
                             $time = 1;
                             $record = $student->checkins()->where('classroomId', $classroom->id)->whereDate('created_at', $checkinHistory->date)->whereTime('created_at', '>', '12:00')->orderByDesc('created_at')->first();
                         }
-
-
 
                         $result = [
                             'date' => $checkinHistory->date,
