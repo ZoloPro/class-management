@@ -84,7 +84,6 @@ Route::prefix('/lecturer')->group(function () {
 
         Route::get('/me', [Api\LecturerAuth::class, 'me']);
         Route::get('/classrooms', [Api\LecturerController::class, 'getClassroomsByLoggedLecturer']);
-//        Route::get('/classrooms/{classroomId}/attendance', [Api\StudentController::class, 'getMarksByLoggedStudent']);
 
         Route::get('/documents/{classroomId}', [Api\DocumentController::class, 'getDocumentsByClassLecturer']);
         Route::post('/documents/{classroomId}', [Api\DocumentController::class, 'uploadFile']);

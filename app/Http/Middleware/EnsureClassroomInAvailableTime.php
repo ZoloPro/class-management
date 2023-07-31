@@ -2,12 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Classroom;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class   EnsureClassroomOwner
+class EnsureClassroomInAvailableTime
 {
     /**
      * Handle an incoming request.
@@ -17,14 +17,14 @@ class   EnsureClassroomOwner
     public function handle(Request $request, Closure $next): Response
     {
         $classroomId = $request->route('classroomId');
-        $lecturer = Auth::guard('lecturerToken')->user();
-        $classroom = $lecturer->classrooms()->find($classroomId);
-        if (!$classroom) {
+        $classroom = Classroom::find($classroomId);
+        $curDate = date('Y-m-d');
+        if ($curDate < $classroom->startDate || $curDate > $classroom->endDate) {
             return response()->json([
                 'success' => 0,
-                'message' => 'You are not the owner of this classroom',
+                'message' => 'Class is out of time',
                 'data' => [],
-            ], 403);
+            ], 400);
         }
         return $next($request);
     }

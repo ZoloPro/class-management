@@ -21,6 +21,8 @@ class ClassroomController extends Controller
                 'id' => $classroom->id,
                 'term' => $classroom->term,
                 'lecturer' => $classroom->lecturer,
+                'startDate' => $classroom->startDate,
+                'endDate' => $classroom->endDate,
             ];
         });
         // Return Json Response

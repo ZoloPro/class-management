@@ -13,11 +13,10 @@ class CheckinHistory extends Model
 
     protected $primaryKey = 'id';
 
-    public $timestamps = false;
-
     protected $fillable = [
         'classroomId',
         'date',
+        'time',
     ];
 
     public function classroom()

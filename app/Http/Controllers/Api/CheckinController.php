@@ -122,10 +122,14 @@ class CheckinController extends Controller
 
     public function logCheckin(string $classroomId)
     {
-        $lecturer = auth()->user();
+        $time = 0;
+        if (date('H') > 12) {
+            $time = 1;
+        }
         $checkinHistory = CheckinHistory::firstOrCreate([
             'classroomId' => $classroomId,
             'date' => date('Y-m-d'),
+            'time' => $time,
         ]);
         return response()->json([
             'success' => 1,
@@ -146,7 +150,6 @@ class CheckinController extends Controller
         $checkinHistories = CheckinHistory::where('classroomId', $classroomId)
             ->where('date', '>=', $from)
             ->where('date', '<=', $to)
-            ->orderBy('date')
             ->get();
         $checkedInList = $students->map(function ($student) use ($checkinHistories) {
             return [
@@ -189,11 +192,27 @@ class CheckinController extends Controller
                         'term' => $classroom->term,
                         'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
                     ],
-                    'checkinDate' => $classroom->checkins()->where('studentId', $student->id)->orderBy('created_at', 'desc')->get()->map(function ($checkin) {
-                        return [
-                            'type' => $checkin->type,
-                            'checkinTime' => $checkin->created_at,
+                    'checkinDate' => $classroom->checkinHistory()->orderByDesc('date')->orderBy('time')->get()->map(function ($checkinHistory) use ($classroom, $student) {
+                        $time = 0;
+                        if ($checkinHistory->time == 0) {
+                            $time = 0;
+                            $record = $student->checkins()->where('classroomId', $classroom->id)->whereDate('created_at', $checkinHistory->date)->whereTime('created_at', '<', '12:00')->orderByDesc('created_at')->first();
+                        } else {
+                            $time = 1;
+                            $record = $student->checkins()->where('classroomId', $classroom->id)->whereDate('created_at', $checkinHistory->date)->whereTime('created_at', '>', '12:00')->orderByDesc('created_at')->first();
+                        }
+
+                        $result = [
+                            'date' => $checkinHistory->date,
+                            'time' => $time,
+                            'isChecked' => [
+                                'type' => $record ? $record->type : 0,
+                            ],
                         ];
+                        if ($record) {
+                            $result['isChecked']['checkinTime'] = $record->created_at;
+                        }
+                        return $result;
                     })
                 ];
             });
