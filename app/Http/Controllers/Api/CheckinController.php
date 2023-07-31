@@ -100,7 +100,7 @@ class CheckinController extends Controller
             $timeStr = date('d/m/y H:i:s');
             return response()->json([
                 'success' => 1,
-                'message' => `Check in successfully $classroom->term->termName at $timeStr`,
+                'message' => "Check in successfully class {$classroom->term->termName} at $timeStr",
                 'data' => [
                     'classroom' => [
                         'id' => $classroom->id,
