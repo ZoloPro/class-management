@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
@@ -47,7 +48,7 @@ class Student extends Authenticatable
             'checkin',
             'studentId',
             'classroomId',
-        )->withTimestamps()->as('checkin');
+        )->withTimestamps()->withPivot('type')->as('checkin');
     }
 
     public function hasGrades(): BelongsToMany
@@ -58,5 +59,10 @@ class Student extends Authenticatable
             'studentId',
             'classroomId'
         )->as('grade')->withPivot(['attendanceGrade', 'examGrade', 'finalGrade']);
+    }
+
+    public function checkins(): HasMany
+    {
+        return $this->hasMany(Checkin::class, 'studentId');
     }
 }

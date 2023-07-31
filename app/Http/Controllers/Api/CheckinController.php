@@ -11,14 +11,28 @@ use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class CheckinController extends Controller
 {
     public function generateCheckinToken(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|in:in,mid,out',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => 'Invalid data',
+                'data' => $validator->errors(),
+            ], 200);
+        }
+        $type = $request->type;
         $key = env('ATTENDANCE_JWT_SECRET');
         $payload = [
             'classroomId' => $request->classroomId,
+            'type' => $type,
             'exp' => time() + 12,
         ];
         $token = JWT::encode($payload, $key, 'HS256');
@@ -77,25 +91,10 @@ class CheckinController extends Controller
                     'data' => []
                 ], 200);
             }
-            $isCheckIn = $classroom->checkedInStudents()->where('studentId', $student->id)->whereDate('checkin.created_at', date('Y-m-d'))->first();
-            if ($isCheckIn) {
-                return response()->json([
-                    'success' => 0,
-                    'message' => 'You have already checked in',
-                    'data' => [
-                        'classroom' => [
-                            'id' => $classroom->id,
-                            'term' => $classroom->term,
-                            'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
-                        ],
-                        'checkinTime' => $isCheckIn->checkin->created_at
-                    ],
-                ], 200);
-            }
-
             $checkin = Checkin::create([
                 'classroomId' => $classroom->id,
                 'studentId' => $student->id,
+                'type' => $decode->type,
                 'date' => date('Y-m-d'),
             ]);
             return response()->json([
@@ -107,6 +106,7 @@ class CheckinController extends Controller
                         'term' => $classroom->term,
                         'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
                     ],
+                    'type' => $checkin->type, // in, mid, out
                     'checkinTime' => $checkin->created_at
                 ]
             ], 200);
@@ -141,12 +141,12 @@ class CheckinController extends Controller
         $classroomId = $request->classroomId;
         $from = $request->query('from');
         $to = $request->query('to');
-
         $classroom = Classroom::find($classroomId);
         $students = $classroom->students;
         $checkinHistories = CheckinHistory::where('classroomId', $classroomId)
             ->where('date', '>=', $from)
             ->where('date', '<=', $to)
+            ->orderBy('date')
             ->get();
         $checkedInList = $students->map(function ($student) use ($checkinHistories) {
             return [
@@ -156,11 +156,14 @@ class CheckinController extends Controller
                 'name' => $student->name,
                 'checkedIn' =>
                     $checkinHistories->map(function ($checkinHistory) use ($student) {
+                        $checks = $student->checkins()->whereDate('created_at', $checkinHistory->date)->orderBy('created_at')->get(['type', 'created_at']);
                         return [
                             'date' => $checkinHistory->date,
-                            'checked' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->checkin->created_at) ?: null];
+                            'checked' => $checks
+                        ];
                     })
             ];
+
         });
         return response()->json([
             'success' => 1,
@@ -186,10 +189,11 @@ class CheckinController extends Controller
                         'term' => $classroom->term,
                         'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
                     ],
-                    'checkinDate' => $classroom->checkinHistory()->orderByDesc('date')->get()->map(function ($checkinHistory) use ($student) {
+                    'checkinDate' => $classroom->checkins()->where('studentId', $student->id)->orderBy('created_at', 'desc')->get()->map(function ($checkin) {
                         return [
-                            'date' => $checkinHistory->date,
-                            'isChecked ' => ($student->checkinClassrooms()->wherePivot('date', $checkinHistory->date)->exists()) ? true : false];
+                            'type' => $checkin->type,
+                            'checkinTime' => $checkin->created_at,
+                        ];
                     })
                 ];
             });

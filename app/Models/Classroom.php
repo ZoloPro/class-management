@@ -51,7 +51,7 @@ class Classroom extends Model
             'checkin',
             'classroomId',
             'studentId',
-        )->withTimestamps()->as('checkin');
+        )->withTimestamps()->withPivot('type')->as('checkin');
     }
 
     public function hasGrades(): BelongsToMany
@@ -77,6 +77,11 @@ class Classroom extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(Document::class, 'classroomId');
+    }
+
+    public function checkins(): HasMany
+    {
+        return $this->hasMany(Checkin::class, 'classroomId');
     }
 
     public function checkinHistory(): HasMany
