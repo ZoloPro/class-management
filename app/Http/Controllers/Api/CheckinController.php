@@ -202,16 +202,16 @@ class CheckinController extends Controller
                             $record = $student->checkins()->where('classroomId', $classroom->id)->whereDate('created_at', $checkinHistory->date)->whereTime('created_at', '>', '12:00')->orderByDesc('created_at')->first();
                         }
 
+
+
                         $result = [
                             'date' => $checkinHistory->date,
                             'time' => $time,
                             'isChecked' => [
                                 'type' => $record ? $record->type : 0,
+                                'checkinTime' => $record ? $record->created_at : null,
                             ],
                         ];
-                        if ($record) {
-                            $result['isChecked']['checkinTime'] = $record->created_at;
-                        }
                         return $result;
                     })
                 ];
