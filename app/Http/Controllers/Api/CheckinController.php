@@ -97,7 +97,7 @@ class CheckinController extends Controller
                 'type' => $decode->type,
                 'date' => date('Y-m-d'),
             ]);
-            $timeStr = date('d/m/y H:i:s', strtotime($checkin->created_at));
+            $timeStr = date('d/m/Y H:i:s', strtotime($checkin->created_at));
             return response()->json([
                 'success' => 1,
                 'message' => "Check in successfully class {$classroom->term->termName} at $timeStr",

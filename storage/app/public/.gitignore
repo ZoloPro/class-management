@@ -1,2 +1,5 @@
 *
 !.gitignore
+
+# My custom
+!/example
