@@ -61,7 +61,15 @@ class Classroom extends Model
             'grade',
             'classroomId',
             'studentId'
-        )->as('grade')->withPivot(['attendanceGrade', 'examGrade', 'finalGrade']);
+        )->as('grade')->withPivot([
+            'attendance',
+            'coefficient1Exam1',
+            'coefficient1Exam2',
+            'coefficient1Exam3',
+            'coefficient2Exam1',
+            'coefficient2Exam2',
+            'exam',
+            'final',]);
     }
 
     public function lecturer(): BelongsTo

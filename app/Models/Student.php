@@ -65,7 +65,8 @@ class Student extends Authenticatable
             'coefficient1Exam3',
             'coefficient2Exam1',
             'coefficient2Exam2',
-            'exam', 'final',]);
+            'exam',
+            'final',]);
     }
 
     public function checkins(): HasMany

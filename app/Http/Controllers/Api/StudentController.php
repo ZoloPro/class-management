@@ -312,7 +312,7 @@ class StudentController extends Controller
         $classroom = Classroom::find($classroomId);
         $examGradeList = $classroom->hasGrades;
         $examGradeList = $examGradeList->map(function ($grade) {
-            return $grade->grade->examGrade;
+            return $grade->grade->exam;
         });
 
         return response()->json([
