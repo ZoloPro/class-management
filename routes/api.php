@@ -49,6 +49,7 @@ Route::prefix('/admin')->group(function () {
         Route::get('/classrooms', [Api\ClassroomController::class, 'index']);
         Route::post('/classrooms', [Api\ClassroomController::class, 'store']);
         Route::delete('/classrooms/{id}', [Api\ClassroomController::class, 'destroy']);
+        Route::put('/classrooms/{id}', [Api\ClassroomController::class, 'update']);
         Route::get('/classrooms/{id}', [Api\ClassroomController::class, 'getStudentsByClassroom']);
         Route::put('/classrooms/{id}/student', [Api\ClassroomController::class, 'updateStudentListByClassroom']);
 

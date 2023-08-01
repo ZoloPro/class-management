@@ -281,15 +281,15 @@ class StudentController extends Controller
             $student = Auth::user();
             $grades = $student->hasGrades;
             $grades = $grades->map(function ($grade) {
+                $gradeCollection = collect($grade->grade);
+                $gradeCollection = $gradeCollection->except(['studentId', 'classroomId']);
                 return [
                     'termId' => $grade->term->id,
                     'termName' => $grade->term->termName,
-                    'attendanceGrade' => $grade->grade->attendanceGrade,
-                    'examGrade' => $grade->grade->examGrade,
-                    'finalGrade' => $grade->grade->finalGrade,
+                    ...$gradeCollection->toArray(),
                 ];
             });
-            $avgGrade = round($grades->avg('finalGrade'), 2);
+            $avgGrade = round($grades->avg('final'), 2);
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data successfully',
@@ -308,8 +308,8 @@ class StudentController extends Controller
 
     public function getGradesOfClassroom(Request $request)
     {
-        $classromId = $request->classroomId;
-        $classroom = Classroom::find($classromId);
+        $classroomId = $request->classroomId;
+        $classroom = Classroom::find($classroomId);
         $examGradeList = $classroom->hasGrades;
         $examGradeList = $examGradeList->map(function ($grade) {
             return $grade->grade->examGrade;

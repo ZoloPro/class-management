@@ -11,9 +11,17 @@ class Grade extends Model
 
     protected $table = 'grade';
 
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'classroomId',
-        'studentCode',
-        'grade',
+        'studentId',
+        'attendance',
+        'coefficient1Exam1',
+        'coefficient1Exam2',
+        'coefficient1Exam3',
+        'coefficient2Exam1',
+        'coefficient2Exam2',
+        'exam',
     ];
 }

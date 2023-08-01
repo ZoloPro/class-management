@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Classroom;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ClassroomController extends Controller
 {
@@ -86,7 +87,12 @@ class ClassroomController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'termId' => 'required|exists:terms,id',
+            'lecturerId' => 'required|exists:lecturers,id',
+            'startDate' => 'required|date',
+            'endDate' => 'required|date|after:startDate',
+        ]);
     }
 
     /**
