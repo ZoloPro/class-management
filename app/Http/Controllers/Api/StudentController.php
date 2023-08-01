@@ -239,7 +239,7 @@ class StudentController extends Controller
                 ], 200);
             }
             $grade = $student->hasGrades()->find($request->classroomId)->grade->grade ?? '';
-            $students = $classroom->registeredStudents()->get();
+            $students = $classroom->registeredStudents()->orderBy('code')->get();
             $students = $students->map(function ($student) {
                 $student = collect($student);
                 return $student->except('register_classroom');

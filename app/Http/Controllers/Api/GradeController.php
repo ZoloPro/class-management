@@ -14,21 +14,12 @@ class GradeController extends Controller
         $lecturer = Auth::user();
         $classroom = $lecturer->classrooms()->find($request->classroomId);
         $gradesMap = [];
-        foreach ($request->grades as $item) {
-            if ($item['attendanceGrade'] !== null || $item['examGrade'] !== null) {
-                $gradesMap[$item['studentId']] = [
-                    'attendanceGrade' => $item['attendanceGrade'],
-                    'examGrade' => $item['examGrade'],
-                ];
-            }
+        foreach ($request->gradeList as $item) {
+            $gradesMap[$item['id']] = $item['grade'];
         }
-        DB::enableQueryLog();
         $classroom->hasGrades()->sync($gradesMap);
-        return DB::getQueryLog();
         $students = $classroom->registeredStudents;
         $data = $students->map(function ($student) use ($classroom) {
-            $grade = $student->hasGrades()->find($classroom->id);
-//            $studentGrade = $grade ? $grade->grade->grade : null;
             return [
                 'id' => $student->id,
                 'code' => $student->code,

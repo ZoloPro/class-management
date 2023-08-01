@@ -190,9 +190,14 @@ class LecturerController extends Controller
         $gradeList = $students->map(function ($student) use ($request) {
             $grade = $student->hasGrades()->find($request->classroomId);
             $studentGrade = [
-                'attendanceGrade' => $grade ? $grade->grade->attendanceGrade : null,
-                'examGrade' => $grade ? $grade->grade->examGrade : null,
-                'finalGrade' => $grade ? $grade->grade->finalGrade : null,
+                'attendance' => $grade ? $grade->grade->attendance : null,
+                'coefficient1Exam1' => $grade ? $grade->grade->coefficient1Exam1 : null,
+                'coefficient1Exam2' => $grade ? $grade->grade->coefficient1Exam2 : null,
+                'coefficient1Exam3' => $grade ? $grade->grade->coefficient1Exam3 : null,
+                'coefficient2Exam1' => $grade ? $grade->grade->coefficient2Exam1 : null,
+                'coefficient2Exam2' => $grade ? $grade->grade->coefficient2Exam2 : null,
+                'exam' => $grade ? $grade->grade->exam : null,
+                'final' => $grade ? $grade->grade->final : null,
             ];
             return [
                 'id' => $student->id,

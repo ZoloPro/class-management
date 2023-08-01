@@ -88,11 +88,33 @@ class ClassroomController extends Controller
     public function update(Request $request, string $id)
     {
         $validator = Validator::make($request->all(), [
-            'termId' => 'required|exists:terms,id',
-            'lecturerId' => 'required|exists:lecturers,id',
+            'termId' => 'required|exists:term,id',
+            'lecturerId' => 'required|exists:lecturer,id',
             'startDate' => 'required|date',
             'endDate' => 'required|date|after:startDate',
         ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => $validator->errors()->first(),
+                'data' => []
+            ], 400);
+        }
+        try {
+            $classroom = Classroom::find($id);
+            $classroom->update($request->all());
+            return response()->json([
+                'success' => 1,
+                'message' => "Updated classroom with id {$id} successfully",
+                'data' => ['classroom' => $classroom]], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 0,
+                'message' => $e->getMessage(),
+                'errorCode' => $e->getCode(),
+            ], 400
+            );
+        }
     }
 
     /**
