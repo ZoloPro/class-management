@@ -289,7 +289,12 @@ class StudentController extends Controller
                     ...$gradeCollection->toArray(),
                 ];
             });
-            $avgGrade = round($grades->avg('final'), 2);
+
+            $hasNotNullFinal = collect($grades)->some(function ($item) {
+                return $item['final'] !== null;
+            });
+
+            $avgGrade = $hasNotNullFinal ? round($grades->avg('final'), 2) : null;
             return response()->json([
                 'success' => 1,
                 'message' => 'Get data successfully',

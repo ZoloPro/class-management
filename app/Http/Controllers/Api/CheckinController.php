@@ -207,7 +207,6 @@ class CheckinController extends Controller
                         'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
                     ],
                     'checkinDate' => $classroom->checkinHistory()->orderByDesc('date')->orderBy('time')->get()->map(function ($checkinHistory) use ($classroom, $student) {
-                        $time = 0;
                         if ($checkinHistory->time == 0) {
                             $time = 0;
                             $record = $student->checkins()->where('classroomId', $classroom->id)->whereDate('created_at', $checkinHistory->date)->whereTime('created_at', '<', '12:00')->orderByDesc('created_at')->first();
@@ -215,7 +214,6 @@ class CheckinController extends Controller
                             $time = 1;
                             $record = $student->checkins()->where('classroomId', $classroom->id)->whereDate('created_at', $checkinHistory->date)->whereTime('created_at', '>', '12:00')->orderByDesc('created_at')->first();
                         }
-
                         $result = [
                             'date' => $checkinHistory->date,
                             'time' => $time,
