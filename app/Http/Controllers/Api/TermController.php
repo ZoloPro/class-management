@@ -41,11 +41,13 @@ class TermController extends Controller
     {
         try {
             // Save term
-            Term::create($request->all());
+            $term = Term::create($request->all());
 
             // Return Json Response
             return response()->json([
-                'message' => "Term successfully saved."
+                'status' => 'success',
+                'message' => "Term successfully saved.",
+                'data' => ['term' => $term]
             ], 201);
         } catch (\Exception $e) {
             // Return Json Response
@@ -80,8 +82,8 @@ class TermController extends Controller
     {
         try {
             // Update term
-            $term = Term::find($id)->update($request->all());
-
+            $term = Term::find($id);
+            $term = $term->update($request->all());
             // Return Json Response
             return response()->json([
                 'success' => 1,

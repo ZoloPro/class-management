@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureClassroomOwner;
 use App\Http\Middleware\EnsureInClassroom;
+use App\Http\Middleware\EnsureStudentActivated;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api;
 
@@ -19,7 +20,7 @@ use App\Http\Controllers\Api;
 Route::prefix('/admin')->group(function () {
     Route::post('/login', [Api\AdminAuth::class, 'login']);
 
-    Route::middleware('auth:adminToken')->group(function () {
+    Route::middleware(['auth:adminToken', EnsureStudentActivated::class])->group(function () {
         Route::prefix('/import')->group(function () {
             Route::post('/lecturers', [Api\LecturerController::class, 'import']);
             Route::get('/lecturers/example', [Api\LecturerController::class, 'downloadExampleImportFile']);
@@ -62,6 +63,7 @@ Route::prefix('/admin')->group(function () {
 
 Route::prefix('/student')->group(function () {
     Route::post('/login', [Api\StudentAuth::class, 'login']);
+    Route::post('/forgot-password', [Api\ForgotPasswordController::class, 'index']);
 
     Route::middleware('auth:studentToken')->group(function () {
         Route::get('/logout', [Api\StudentAuth::class, 'logout']);
@@ -73,7 +75,6 @@ Route::prefix('/student')->group(function () {
         Route::post('/password', [Api\StudentAuth::class, 'changePassword']);
         Route::post('/checkin', [Api\CheckinController::class, 'checkIn']);
         Route::get('/checkin-history', [Api\CheckinController::class, 'getCheckinHistoryByStudent']);
-
     });
 });
 
@@ -96,9 +97,11 @@ Route::prefix('/lecturer')->group(function () {
 
         Route::post('/password', [Api\LecturerAuth::class, 'changePassword']);
 
-        Route::get('/grades/{classroomId}', [Api\LecturerController::class, 'getGradesByClassroom'])->middleware(EnsureClassroomOwner::class);
+        Route::get('/grades/{classroomId}', [Api\GradeController::class, 'getGradesByClassroom'])->middleware(EnsureClassroomOwner::class);
         Route::put('/grades/{classroomId}', [Api\GradeController::class, 'updateGrade'])->middleware(EnsureClassroomOwner::class);
+
     });
+    Route::get('/grades/{classroomId}/report', [Api\ReportController::class, 'index']);
 });
 
 //

@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -31,6 +32,7 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $exception)
     {
+
         if ($exception instanceof ModelNotFoundException) {
             return response()->json([
                 'success' => 0,
@@ -41,6 +43,10 @@ class Handler extends ExceptionHandler
                 'susscess' => 0,
                 'message' => 'Foreign Key Constraint Violation',
                 'errorCode' => 2300], 400);
+        } else if ($exception instanceof ValidationException) {
+            return response()->json([
+                'success' => 0,
+                'message' => $exception->getMessage()], 200);
         }
         return parent::render($request, $exception);
     }
