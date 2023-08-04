@@ -9,7 +9,9 @@ class VertifyEmail extends Model
 {
     use HasFactory;
 
-    protected $table = 'vertify_email_tokens';
+    protected $table = 'verify_email_tokens';
+
+    public $timestamps = false;
 
     protected $primaryKey = 'code';
 

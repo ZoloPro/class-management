@@ -20,7 +20,7 @@ use App\Http\Controllers\Api;
 Route::prefix('/admin')->group(function () {
     Route::post('/login', [Api\AdminAuth::class, 'login']);
 
-    Route::middleware(['auth:adminToken', EnsureStudentActivated::class])->group(function () {
+    Route::middleware('auth:adminToken')->group(function () {
         Route::prefix('/import')->group(function () {
             Route::post('/lecturers', [Api\LecturerController::class, 'import']);
             Route::get('/lecturers/example', [Api\LecturerController::class, 'downloadExampleImportFile']);
@@ -66,6 +66,8 @@ Route::prefix('/student')->group(function () {
     Route::post('/forgot-password', [Api\ForgotPasswordController::class, 'index']);
 
     Route::middleware('auth:studentToken')->group(function () {
+        Route::middleware(EnsureStudentActivated::class)->group(function () {
+        });
         Route::get('/logout', [Api\StudentAuth::class, 'logout']);
         Route::get('/me', [Api\StudentAuth::class, 'me']);
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
@@ -75,6 +77,9 @@ Route::prefix('/student')->group(function () {
         Route::post('/password', [Api\StudentAuth::class, 'changePassword']);
         Route::post('/checkin', [Api\CheckinController::class, 'checkIn']);
         Route::get('/checkin-history', [Api\CheckinController::class, 'getCheckinHistoryByStudent']);
+
+        Route::post('/active', [Api\StudentAuth::class, 'activeAccount']);
+
     });
 });
 

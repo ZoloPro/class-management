@@ -8,10 +8,12 @@ use App\Mail\SendCodeResetPassword;
 use App\Models\PasswordReset;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 class ForgotPasswordController extends Controller
 {
@@ -36,7 +38,7 @@ class ForgotPasswordController extends Controller
 
         return response()->json([
             'success' => 1,
-            'message' => 'We have e-mailed your password reset code!',
+            'message' => 'We have e-mailed your password reset link!',
             'data' => [
                 'code' => $request->code,
                 'email' => $student->email
@@ -66,6 +68,7 @@ class ForgotPasswordController extends Controller
         $student = Student::firstWhere('email', $passwordReset->email);
         $student->password = Hash::make('tksv' . substr($student->code, -4));
 
+        $student->isActived = 0;
         $student->save();
 
         // delete current code
@@ -76,4 +79,26 @@ class ForgotPasswordController extends Controller
             'message' => 'password has been successfully reset'], 200);
     }
 
+    public function changePassword(Request $request)
+    {
+        $student = Auth::user();
+
+        $request->validate([
+            'password' => ['required', 'different:oldPassword', 'max:50', Password::min(6)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+                ->symbols()],
+        ]);
+
+        $student->password = Hash::make($request->password);
+
+        $student->isActived = 1;
+
+        $student->save();
+
+        return response()->json([
+            'success' => 1,
+            'message' => 'password has been successfully changed'], 200);
+    }
 }

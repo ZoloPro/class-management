@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Mail\SendCodeResetPassword;
 use App\Mail\SendLinkVerifyEmail;
+use App\Models\Student;
 use App\Models\VertifyEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -95,7 +95,7 @@ class StudentAuth extends Controller
     {
         $validator = Validator::make($request->all(), [
             'oldPassword' => 'required',
-            'newPassword' => ['required', 'different:oldPassword', 'max:20', Password::min(6)
+            'newPassword' => ['required', 'different:oldPassword', 'max:50', Password::min(6)
                 ->letters()
                 ->mixedCase()
                 ->numbers()
@@ -130,80 +130,28 @@ class StudentAuth extends Controller
 
     public function activeAccount(Request $request)
     {
-        $code = Auth::user()->code;
+        $student = Auth::user();
 
         $request->validate([
             'email' => 'required|email|unique:student,email',
             'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:student,phone',
-            'password' => ['required', 'max:20', Password::min(6)
+            'password' => ['required', 'max:50', Password::min(6)
                 ->letters()
                 ->mixedCase()
                 ->numbers()
                 ->symbols()],
-            'confirmPassword' => 'required|same:password',
         ]);
 
-        $token = Str::random(20);
-
-        $verifyEmail = VertifyEmail::updateOrCreate(['code' => $code], [
-            'email' => $request->email,
-            'token' => $request->token,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-            'created_at' => now(),
-        ]);
-
-        if ($verifyEmail) {
-            Mail::to($request->email)->send(new SendLinkVerifyEmail($token));
-        }
-
+        $student->email = $request->email;
+        $student->phone = $request->phone;
+        $student->password = Hash::make($request->password);
+        $student->save();
         return response()->json([
             'success' => 1,
-            'message' => 'We have e-mailed your password reset code!',
+            'message' => 'Update student information successfully',
             'data' => [
-                'code' => $code,
-                'email' => $request->email,
+                'student' => $student
             ]
-        ]);
-
-    }
-
-    public function verifyEmail(Request $request)
-    {
-        $request->validate([
-            'token' => 'required|string|exists:vertify_email_tokens,token',
-        ]);
-
-        $verifyEmail = VertifyEmail::where('token', $request->token)->first();
-
-        // check if it does not expired: the time is one hour
-        if ($verifyEmail->created_at < now()->subMinute(5)) {
-            $verifyEmail->delete();
-            return response()->json([
-                'success' => 0,
-                'message' => 'Link is expire'], 422);
-        }
-
-        if ($verifyEmail) {
-            $student = Auth::user();
-            $student->email = $verifyEmail->email;
-            $student->phone = $verifyEmail->phone;
-            $student->password = $verifyEmail->password;
-            $student->save();
-            $verifyEmail->delete();
-            return response()->json([
-                'success' => 1,
-                'message' => 'Verify email successfully',
-                'data' => [
-                    'user' => $student,
-                ]
-            ]);
-        }
-
-        return response()->json([
-            'success' => 0,
-            'message' => 'Verify email failed',
-            'data' => []
         ]);
     }
 }

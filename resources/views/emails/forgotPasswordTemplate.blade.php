@@ -1,5 +1,10 @@
-<h1>Chúng tôi đã nhận được yêu cầu để đặt lại mật khẩu tài khoản của bạn</h1>
-<p>Bạn có thể nhấp vào đường Link sau để khôi phục tài khoản về mật khẩu mặc định:</p>
-{{ $url }}
+<h3>SGU Connect xin thông báo:</h3>
+<p>Chúng tôi đã nhận được yêu cầu Quên mật khẩu của bạn. Vui lòng nhấn vào đường dẫn <a href='{{ url($url) }}'>tại
+        đây</a> để
+    đổi mật khẩu mới.</p>
+<p>Nếu bạn không thực hiện yêu cầu thì vui lòng bỏ qua Email này hoặc tài khoản của bạn đang bị kẻ gian đánh cấp, bạn
+    vui lòng đổi mật khẩu ngay.</p>
+<p>Xin trân thành cảm ơn</p>
+<p>Trân Trọng!</p>
+<p>SGU Connect</p>
 
-<p>Thời gian hiệu lực của đường link là 5 phút kể từ thời điểm gửi thông báo này</p>
