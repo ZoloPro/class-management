@@ -93,8 +93,6 @@ class ForgotPasswordController extends Controller
 
         $student->password = Hash::make($request->password);
 
-        $student->isActived = 1;
-
         $student->save();
 
         return response()->json([
