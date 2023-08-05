@@ -125,22 +125,22 @@
                 </td>
                 <td>
                     @isset($statistical['b'])
-                    {{$statistical['b']['quantity']}} ({{$statistical['a']['percent']}}%)
+                    {{$statistical['b']['quantity']}} ({{$statistical['b']['percent']}}%)
                     @endisset
                 </td>
                 <td>
                     @isset($statistical['c'])
-                    {{$statistical['c']['quantity']}} ({{$statistical['a']['percent']}}%)
+                    {{$statistical['c']['quantity']}} ({{$statistical['c']['percent']}}%)
                     @endisset
                 </td>
                 <td>
                     @isset($statistical['d'])
-                    {{$statistical['d']['quantity']}} ({{$statistical['a']['percent']}}%)
+                    {{$statistical['d']['quantity']}} ({{$statistical['d']['percent']}}%)
                     @endisset
                 </td>
                 <td>
                     @isset($statistical['f'])
-                    {{$statistical['f']['quantity']}} ({{$statistical['a']['percent']}}%)
+                    {{$statistical['f']['quantity']}} ({{$statistical['f']['percent']}}%)
                     @endisset
                 </td>
 
