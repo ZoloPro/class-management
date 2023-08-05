@@ -55,7 +55,7 @@ class ForgotPasswordController extends Controller
         ];
 
         $validator = Validator::make($request->all(), [
-            'token' => 'required|exists:password_resets,token',
+            'token' => 'required|exists:password_reset_tokens,token',
         ]);
 
         if ($validator->fails()) {
@@ -74,7 +74,6 @@ class ForgotPasswordController extends Controller
         $student = Student::firstWhere('email', $passwordReset->email);
         $student->password = Hash::make('tksv' . substr($student->code, -4));
 
-        $student->isActived = 0;
         $student->save();
 
         // delete current code
