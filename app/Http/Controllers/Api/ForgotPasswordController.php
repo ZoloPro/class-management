@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
@@ -48,11 +49,18 @@ class ForgotPasswordController extends Controller
 
     public function resetPasswordWithToken(Request $request)
     {
-        $request->validate([
-            'token' => 'required|string|exists:password_reset_tokens',
-        ], [
-            'token.exists' => 'The token is invalid.'
+        $data = [
+            'success' => false,
+            'message' => 'Đường link hết hạn, vui lòng thử lại',
+        ];
+
+        $validator = Validator::make($request->all(), [
+            'token' => 'required|exists:password_resets,token',
         ]);
+
+        if ($validator->fails()) {
+            return view('resetPassword', $data);
+        }
 
         // find the code
         $passwordReset = PasswordReset::firstWhere('token', $request->token);
@@ -60,9 +68,7 @@ class ForgotPasswordController extends Controller
         // check if it does not expired: the time is one hour
         if ($passwordReset->created_at < now()->subMinute(5)) {
             $passwordReset->delete();
-            return response()->json([
-                'success' => 0,
-                'message' => 'OTP is expire'], 422);
+            return view('resetPassword', $data);
         }
 
         $student = Student::firstWhere('email', $passwordReset->email);
@@ -74,29 +80,9 @@ class ForgotPasswordController extends Controller
         // delete current code
         $passwordReset->delete();
 
-        return response()->json([
-            'success' => 1,
-            'message' => 'password has been successfully reset'], 200);
-    }
+        $data['success'] = true;
+        $data['message'] = 'Đã khôi phục mật khẩu thành công, bạn có thể đóng tab này và quay lại ứng dụng';
 
-    public function changePassword(Request $request)
-    {
-        $student = Auth::user();
-
-        $request->validate([
-            'password' => ['required', 'different:oldPassword', 'max:50', Password::min(6)
-                ->letters()
-                ->mixedCase()
-                ->numbers()
-                ->symbols()],
-        ]);
-
-        $student->password = Hash::make($request->password);
-
-        $student->save();
-
-        return response()->json([
-            'success' => 1,
-            'message' => 'password has been successfully changed'], 200);
+        return view('resetPassword', $data);
     }
 }

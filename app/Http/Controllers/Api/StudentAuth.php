@@ -135,17 +135,12 @@ class StudentAuth extends Controller
         $request->validate([
             'email' => 'required|email|unique:student,email',
             'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:student,phone',
-            'password' => ['required', 'max:50', Password::min(6)
-                ->letters()
-                ->mixedCase()
-                ->numbers()
-                ->symbols()],
         ]);
 
         $student->email = $request->email;
         $student->phone = $request->phone;
-        $student->password = Hash::make($request->password);
         $student->save();
+
         return response()->json([
             'success' => 1,
             'message' => 'Update student information successfully',

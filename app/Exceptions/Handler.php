@@ -44,9 +44,10 @@ class Handler extends ExceptionHandler
                 'message' => 'Foreign Key Constraint Violation',
                 'errorCode' => 2300], 400);
         } else if ($exception instanceof ValidationException) {
+            $errorCollect = collect($exception->errors());
             return response()->json([
                 'success' => 0,
-                'message' => $exception->getMessage()], 200);
+                'message' => $errorCollect->first()], 200);
         }
         return parent::render($request, $exception);
     }
