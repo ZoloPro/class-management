@@ -134,7 +134,7 @@ class StudentAuth extends Controller
 
         $request->validate([
             'email' => 'required|email|unique:student,email',
-            'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:student,phone',
+            'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9|unique:student,phone',
         ]);
 
         $student->email = $request->email;
