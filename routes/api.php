@@ -105,8 +105,8 @@ Route::prefix('/lecturer')->group(function () {
         Route::get('/grades/{classroomId}', [Api\GradeController::class, 'getGradesByClassroom'])->middleware(EnsureClassroomOwner::class);
         Route::put('/grades/{classroomId}', [Api\GradeController::class, 'updateGrade'])->middleware(EnsureClassroomOwner::class);
 
+        Route::get('/grades/{classroomId}/report', [Api\ReportController::class, 'index']);
     });
-    Route::get('/grades/{classroomId}/report', [Api\ReportController::class, 'index']);
 });
 
 //

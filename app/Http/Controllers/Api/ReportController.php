@@ -80,14 +80,6 @@ class ReportController extends Controller
                 'percent' => $studentQty > 0 ? round($tmpArr->count() / $studentQty * 100, 2) : 0,
             ];
         }
-//
-//        return view('gradeReport.gradeReportTemplate', [
-//            'classroom' => $classroom,
-//            'lecturer' => $lecturer,
-//            'studentQty' => $studentQty,
-//            'gradeList' => $gradeList,
-//            'statistical' => $statistical,
-//        ]);
 
         $date = [
             'date' => date('d'),
@@ -103,6 +95,6 @@ class ReportController extends Controller
             'statistical' => $statistical,
             'date' => $date,
         ]);
-        return $pdf->stream('document.pdf');
+        return $pdf->download('document.pdf');
     }
 }

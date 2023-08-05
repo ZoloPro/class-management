@@ -132,10 +132,19 @@ class StudentAuth extends Controller
     {
         $student = Auth::user();
 
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:student,email',
             'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9|unique:student,phone',
+        ], [
+            'code.exists' => 'Student code does not exist'
         ]);
+
+        if ($validator->stopOnFirstFailure()->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => $validator->errors()->first(),
+                'data' => []], 200);
+        }
 
         $student->email = $request->email;
         $student->phone = $request->phone;
