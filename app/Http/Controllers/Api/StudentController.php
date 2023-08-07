@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Import\StudentsImport;
 use App\Models\Classroom;
+use App\Models\Semester;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -202,20 +203,32 @@ class StudentController extends Controller
         try {
             $student = Auth::user();
             $classrooms = $student->registeredClassrooms;
-            $response = [];
-            foreach ($classrooms as $classroom) {
-                $lecturer = $classroom->lecturer->only(['code', 'fullname']);
-                $response[] = [
-                    'id' => $classroom['id'],
-                    'lecturer' => $lecturer,
-                    'term' => $classroom->term,
+            $classroomGroup = $classrooms->groupBy(function ($classroom) {
+                return $classroom->semesterId;
+            });
+            $classroomGroup = $classroomGroup->sortByDesc(function ($classrooms, $semesterId) {
+                $semster = Semester::find($semesterId);
+                return $semster->startDate;
+            });
+            $semesterData = $classroomGroup->map(function ($classrooms, $semesterId) {
+                $semester = Semester::find($semesterId);
+                return [
+                    'idSemester' => $semesterId,
+                    'nameSemester' => $semester->semesterName,
+                    'list_classroom' => $classrooms->map(function ($classroom) {
+                        return [
+                            'id' => $classroom->id,
+                            'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
+                            'term' => $classroom->term,
+                        ];
+                    }),
                 ];
-            }
+            });
             return response()->json([
                 'success' => 1,
-                'message' => 'Get all classrooms by logged in student successfully',
-                'data' => ['classrooms' => $response],
-            ]);
+                'message' => 'Get all classrooms successfully',
+                'data' => array_values($semesterData->toArray()),
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,
@@ -279,29 +292,11 @@ class StudentController extends Controller
     {
         try {
             $student = Auth::user();
-            $grades = $student->hasGrades;
-            $grades = $grades->map(function ($grade) {
-                $gradeCollection = collect($grade->grade);
-                $gradeCollection = $gradeCollection->except(['studentId', 'classroomId']);
-                return [
-                    'termId' => $grade->term->id,
-                    'termName' => $grade->term->termName,
-                    ...$gradeCollection->toArray(),
-                ];
+            $classrooms = $student->registeredClassrooms;
+            $grades = $classrooms->groupBy(function ($classroom) {
+                return $classroom->semester;
             });
-
-            $hasNotNullFinal = collect($grades)->some(function ($item) {
-                return $item['final'] !== null;
-            });
-
-            $avgGrade = $hasNotNullFinal ? round($grades->avg('final'), 2) : null;
-            return response()->json([
-                'success' => 1,
-                'message' => 'Get data successfully',
-                'data' => [
-                    'avgGrade' => $avgGrade,
-                    'grades' => $grades],
-            ], 200);
+            dd($grades);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 0,

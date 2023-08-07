@@ -97,8 +97,8 @@ class Classroom extends Model
         return $this->hasMany(CheckinHistory::class, 'classroomId');
     }
 
-    public function wifiInfo(): HasOne
+    public function semester(): BelongsTo
     {
-        return $this->hasOne(WifiInfo::class, 'classroomId');
+        return $this->belongsTo(Semester::class, 'semesterId');
     }
 }
