@@ -20,10 +20,17 @@ class ForgotPasswordController extends Controller
 {
     public function index(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'code' => 'required|exists:student,code',
             'email' => 'required|exists:student,email,code,' . $request->code,
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => $validator->errors()->first(),
+            ]);
+        }
 
         $student = Student::where('code', $request->code)->first();
 

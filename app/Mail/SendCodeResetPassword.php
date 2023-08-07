@@ -29,7 +29,7 @@ class SendCodeResetPassword extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Send Code Reset Password',
+            subject: 'Khôi phục mật khẩu',
         );
     }
 
