@@ -357,19 +357,33 @@ class StudentController extends Controller
                 ];
             };
 
-            $semesterGPA10 = $totalGPA10 / $courseCreditsAchieve;
-            $semesterGPA4 = $totalGPA4 / $courseCreditsAchieve;
+            if ($courseCreditsAchieve > 0) {
+                $semesterGPA10 = $totalGPA10 / $courseCreditsAchieve;
+                $semesterGPA4 = $totalGPA4 / $courseCreditsAchieve;
+            } else {
+                $semesterGPA10 = '';
+                $semesterGPA4 = '';
+            }
+
             $totalCumulativeGPA10 += $totalGPA10;
             $totalCumulativeGPA4 += $totalGPA4;
             $courseCreditsAll += $courseCreditsAchieve;
+
+            if ($courseCreditsAll > 0) {
+                $cumulativeGPA10 = round($totalCumulativeGPA10 / $courseCreditsAll, 2);
+                $cumulativeGPA4 = round($totalCumulativeGPA4 / $courseCreditsAll, 2);
+            } else {
+                $cumulativeGPA10 = '';
+                $cumulativeGPA4 = '';
+            }
 
             return [
                 'idSemester' => $semesterId,
                 'nameSemester' => $semester->semesterName,
                 "semesterGPA10" => $semesterGPA10 . '' ?? '',
                 "semesterGPA4" => $semesterGPA4 . '' ?? '',
-                "cumulativeGPA10" => round($totalCumulativeGPA10 / $courseCreditsAll, 2) . '' ?? '',
-                "cumulativeGPA4" => round($totalCumulativeGPA4 / $courseCreditsAll, 2) . '' ?? '',
+                "cumulativeGPA10" => $cumulativeGPA10 . '' ?? '',
+                "cumulativeGPA4" => $cumulativeGPA4 . '' ?? '',
                 "courseCreditsAchieve" => $courseCreditsAchieve . '',
                 "courseCreditsAll" => $courseCreditsAll . '',
                 "list_grade" => $listGrade
