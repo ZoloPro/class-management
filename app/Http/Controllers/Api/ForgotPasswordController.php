@@ -54,6 +54,11 @@ class ForgotPasswordController extends Controller
         ]);
     }
 
+    public function showForgotPasswordForm()
+    {
+        return view('forgotPassword');
+    }
+
     public function resetPasswordWithToken(Request $request)
     {
         $data = [

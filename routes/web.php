@@ -19,3 +19,4 @@ Route::get('/', function () {
 
 Route::get('/reset-password', [\App\Http\Controllers\Api\ForgotPasswordController::class, 'resetPasswordWithToken']);
 Route::get('/active', [\App\Http\Controllers\Api\StudentAuth::class, 'verifyEmail']);
+Route::get('/forgot-password', [\App\Http\Controllers\Api\ForgotPasswordController::class, 'showForgotPasswordForm']);

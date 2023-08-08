@@ -392,7 +392,7 @@ class StudentController extends Controller
         return response()->json([
             'success' => 1,
             'message' => 'Get data successfully',
-            'data' => $semesterData
+            'data' => array_values($semesterData->toArray())
         ], 200);
     }
 
