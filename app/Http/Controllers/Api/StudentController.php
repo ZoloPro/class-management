@@ -290,164 +290,96 @@ class StudentController extends Controller
     //Lấy tất cả điểm của sinh viên đang đăng nhập
     public function getGradesByLoggedStudent()
     {
-        return response()->json([
-            "status" => 1,
-            "data" => [
-                [
-                    "idSemester" => 1,
-                    "nameSemester" => "Học kỳ 1(NH=> 2020 -2021)",
-                    "semesterGPA10" => "8.6",
-                    "semesterGPA4" => "3.7",
-                    "cumulativeGPA10" => "8.2",
-                    "cumulativeGPA4" => "3.36",
-                    "list_grade" => [
-                        [
-                            "termId" => 1,
-                            "termName" => "Lập trình căn bản",
-                            "attendance" => "9.0",
-                            "coefficient1Exam1" => "8.0",
-                            "coefficient2Exam1" => "9.0",
-                            "coefficient3Exam1" => "7.0",
-                            "coefficient1Exam2" => "10.0",
-                            "coefficient2Exam2" => "9.0",
-                            "exam" => "9.5",
-                            "final" => "8.8",
-                            "gpa10" => "8.8",
-                            "gpa4" => "3.7",
-                            "gbaCH" => "A",
-                            "result" => "Đạt",
-                        ],
-                        [
-                            "termId" => 1,
-                            "termName" => "Thiết kế Web",
-                            "attendance" => "9.0",
-                            "coefficient1Exam1" => "8.0",
-                            "coefficient2Exam1" => "9.0",
-                            "coefficient3Exam1" => "",
-                            "coefficient1Exam2" => "10.0",
-                            "coefficient2Exam2" => "",
-                            "exam" => "9.5",
-                            "final" => "8.8",
-                            "gpa10" => "8.8",
-                            "gpa4" => "3.7",
-                            "gbaCH" => "A",
-                            "result" => "Đạt",
-                        ],
-                        [
-                            "termId" => 3,
-                            "termName" => "Công nghệ phần mềm",
-                            "attendance" => "9.0",
-                            "coefficient1Exam1" => "8.0",
-                            "coefficient2Exam1" => "",
-                            "coefficient3Exam1" => "",
-                            "coefficient1Exam2" => "10.0",
-                            "coefficient2Exam2" => "",
-                            "exam" => "9.5",
-                            "final" => "8.8",
-                            "gpa10" => "8.8",
-                            "gpa4" => "3.7",
-                            "gbaCH" => "A",
-                            "result" => "Đạt",
-                        ]
-                    ]
-                ],
-                [
-                    "idSemester" => 2,
-                    "nameSemester" => "Học kỳ 2(NH=> 2020 -2021)",
-                    "semesterGPA10" => "8.6",
-                    "semesterGPA4" => "3.7",
-                    "cumulativeGPA10" => "8.2",
-                    "cumulativeGPA4" => "3.36",
-                    "list_grade" => [
-                        [
-                            "termId" => 4,
-                            "termName" => "Lập trình Java",
-                            "attendance" => "9.0",
-                            "coefficient1Exam1" => "8.0",
-                            "coefficient2Exam1" => "9.0",
-                            "coefficient3Exam1" => "7.0",
-                            "coefficient1Exam2" => "10.0",
-                            "coefficient2Exam2" => "9.0",
-                            "exam" => "9.5",
-                            "final" => "8.8",
-                            "gpa10" => "8.8",
-                            "gpa4" => "3.7",
-                            "gbaCH" => "A",
-                            "result" => "Đạt",
-                        ],
-                        [
-                            "termId" => 5,
-                            "termName" => "Lập trình web",
-                            "attendance" => "9.0",
-                            "coefficient1Exam1" => "8.0",
-                            "coefficient2Exam1" => "9.0",
-                            "coefficient3Exam1" => "7.0",
-                            "coefficient1Exam2" => "10.0",
-                            "coefficient2Exam2" => "9.0",
-                            "exam" => "9.5",
-                            "final" => "8.8",
-                            "gpa10" => "8.8",
-                            "gpa4" => "3.7",
-                            "gbaCH" => "A",
-                            "result" => "Đạt",
-                        ],
-                        [
-                            "termId" => 6,
-                            "termName" => "Lập trình thiết bị di động",
-                            "attendance" => "9.0",
-                            "coefficient1Exam1" => "8.0",
-                            "coefficient2Exam1" => "",
-                            "coefficient3Exam1" => "7.0",
-                            "coefficient1Exam2" => "",
-                            "coefficient2Exam2" => "",
-                            "exam" => "",
-                            "final" => "",
-                            "gpa10" => "",
-                            "gpa4" => "",
-                            "gbaCH" => "",
-                            "result" => "",
-                        ]
-                    ]
-                ]
-            ]
+        $student = Auth::user();
+        $classrooms = $student->registeredClassrooms;
 
+        $classroomGroup = $classrooms->groupBy(function ($classroom) {
+            return $classroom->semester->id;
+        });
+
+        $classroomGroup = $classroomGroup->sortBy(function ($classrooms, $semesterId) {
+            $semester = Semester::find($semesterId);
+            return $semester->startDate;
+        });
+
+        $totalCumulativeGPA10 = 0;
+        $totalCumulativeGPA4 = 0;
+        $courseCreditsAll = 0;
+
+        $semesterData = $classroomGroup->map(function ($classrooms, $semesterId) use (&$totalCumulativeGPA4, &$totalCumulativeGPA10, &$courseCreditsAll, $student) {
+            $semester = Semester::find($semesterId);
+            $courseCreditsAchieve = 0;
+            $totalGPA10 = 0;
+            $totalGPA4 = 0;
+            $listGrade = [];
+
+            foreach ($classrooms as $classroom) {
+                $hasGrades = $classroom->hasGrades->find($student->id);
+                $grades = $hasGrades ? $hasGrades->grade : null;
+                $gpa4 = $grades && $grades->final !== null ? round($grades->final / 2.5) : '';
+                if ($gpa4 !== '') {
+                    $totalGPA4 += $gpa4 * $classroom->term->credit;
+                    $totalGPA10 += $grades->final * $classroom->term->credit;
+                    $courseCreditsAchieve += $classroom->term->credit;
+                }
+
+                $gpaCH = match ($gpa4) {
+                    4.0 => 'A',
+                    3.0 => 'B',
+                    2.0 => 'C',
+                    1.0 => 'D',
+                    0.0 => 'F',
+                    default => '',
+                };
+
+                if ($gpaCH == 'F')
+                    $result = 'X';
+                elseif ($gpaCH == '')
+                    $result = '|';
+                else
+                    $result = 'Đạt';
+
+                $listGrade[] = [
+                    'termId' => $classroom->term->id,
+                    'termName' => $classroom->term->termName,
+                    'attendance' => $grades && $grades->attendance !== null ? $grades->attendance . '' : '',
+                    'coefficient1Exam1' => $grades && $grades->coefficient1Exam1 !== null ? $grades->coefficient1Exam1 . '' : '',
+                    'coefficient2Exam1' => $grades && $grades->coefficient1Exam2 !== null ? $grades->coefficient1Exam2 . '' : '',
+                    'coefficient3Exam1' => $grades && $grades->coefficient1Exam3 !== null ? $grades->coefficient1Exam3 . '' : '',
+                    'coefficient1Exam2' => $grades && $grades->coefficient2Exam1 !== null ? $grades->coefficient2Exam1 . '' : '',
+                    'coefficient2Exam2' => $grades && $grades->coefficient2Exam2 !== null ? $grades->coefficient2Exam2 . '' : '',
+                    'exam' => $grades && $grades->exam !== null ? $grades->exam . '' : '',
+                    'final' => $grades && $grades->final !== null ? $grades->final . '' : '',
+                    'gpa10' => $grades && $grades->final !== null ? $grades->final . '' : '',
+                    'gpa4' => $gpa4 . '',
+                    'gbaCH' => $gpaCH,
+                    'result' => $result,
+                ];
+            };
+
+            $semesterGPA10 = $totalGPA10 / $courseCreditsAchieve;
+            $semesterGPA4 = $totalGPA4 / $courseCreditsAchieve;
+            $totalCumulativeGPA10 += $totalGPA10;
+            $totalCumulativeGPA4 += $totalGPA4;
+            $courseCreditsAll += $courseCreditsAchieve;
+
+            return [
+                'idSemester' => $semesterId,
+                'nameSemester' => $semester->semesterName,
+                "semesterGPA10" => $semesterGPA10 . '' ?? '',
+                "semesterGPA4" => $semesterGPA4 . '' ?? '',
+                "cumulativeGPA10" => round($totalCumulativeGPA10 / $courseCreditsAll, 2) . '' ?? '',
+                "cumulativeGPA4" => round($totalCumulativeGPA4 / $courseCreditsAll, 2) . '' ?? '',
+                "courseCreditsAchieve" => $courseCreditsAchieve . '',
+                "courseCreditsAll" => $courseCreditsAll . '',
+                "list_grade" => $listGrade
+            ];
+        });
+        return response()->json([
+            'success' => 1,
+            'message' => 'Get data successfully',
+            'data' => $semesterData
         ], 200);
-//        try
-//            $student = Auth::user();
-//            $classrooms = $student->registeredClassrooms;
-//            $classroomGroup = $classrooms->groupBy(function ($classroom) {
-//                return $classroom->semester;
-//                [);
-//            $classroomGroup = $classroomGroup->sortByDesc(function ($classrooms, $semesterId) {
-//                $semester = Semester::find($semesterId);
-//                return $semester->startDate;
-//            });
-//            $semesterData = $classroomGroup->map(function ($classrooms, $semesterId) {
-//                $semester = Semester::find($semesterId);
-//                $grades =
-//                return [
-//                    'idSemester' => $semesterId,
-//                    'nameSemester' => $semester->semesterName,
-//                    "semesterGPA10" => "8.6",
-//                    "semesterGPA4" => "3.7",
-//                    "cumulativeGPA10" => "8.2",
-//                    "cumulativeGPA4" => "3.36",
-//                    'list_classroom' => $classrooms->map(function ($classroom) {
-//                        return [
-//                            'id' => $classroom->id,
-//                            'lecturer' => $classroom->lecturer->only(['code', 'fullname']),
-//                            'term' => $classroom->term,
-//                        ];
-//                    }),
-//                ];
-//            });
-//        } catch (\Exception $e) {
-//        return response()->json([
-//            'success' => 0,
-//            'message' => $e->getMessage(),
-//            'errorCode' => $e->getCode(),
-//        ], 400);
-//    }
     }
 
     public function getGradesOfClassroom(Request $request)
