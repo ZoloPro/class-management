@@ -20,7 +20,7 @@ class SendCodeResetPassword extends Mailable
      */
     public function __construct($token)
     {
-        $this->url = '/reset-password?token=' . $token;
+        $this->url = '/forgot-password?token=' . $token;
     }
 
     /**

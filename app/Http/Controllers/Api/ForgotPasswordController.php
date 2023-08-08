@@ -54,46 +54,75 @@ class ForgotPasswordController extends Controller
         ]);
     }
 
-    public function showForgotPasswordForm()
+    public function showForgotPasswordForm(Request $request)
     {
-        return view('forgotPassword');
+        $validator = Validator::make($request->all(), [
+            'token' => 'required|exists:password_reset_tokens,token',
+        ]);
+        if ($validator->fails()) {
+            return view('resetPassword')->withErrors([
+                'resetPassword' => 'Link đã hết hạn'
+            ]);
+        }
+        return view('forgotPassword', [
+            'token' => $request->token,
+        ]);
     }
 
     public function resetPasswordWithToken(Request $request)
     {
-        $data = [
-            'success' => false,
-            'message' => 'Đường link hết hạn, vui lòng thử lại',
-        ];
-
-        $validator = Validator::make($request->all(), [
+        $checkToken = Validator::make($request->all(), [
             'token' => 'required|exists:password_reset_tokens,token',
         ]);
 
-        if ($validator->fails()) {
-            return view('resetPassword', $data);
+        if ($checkToken->fails()) {
+            return view('resetPassword')->withErrors([
+                'resetPassword' => 'Link đã hết hạn'
+            ]);
         }
 
-        // find the code
-        $passwordReset = PasswordReset::firstWhere('token', $request->token);
+        $passwordReset = PasswordReset::where('token', $request->token)->first();
 
-        // check if it does not expired: the time is one hour
         if ($passwordReset->created_at < now()->subMinute(5)) {
             $passwordReset->delete();
-            return view('resetPassword', $data);
+            return view('resetPassword')->withErrors([
+                'resetPassword' => 'Link đã hết hạn',
+            ]);
         }
 
-        $student = Student::firstWhere('email', $passwordReset->email);
-        $student->password = Hash::make('tksv' . substr($student->code, -4));
+        $checkPassword = Validator::make($request->all(), [
+            'password' => ['required', 'confirmed', Password::min(6)
+                ->mixedCase()
+                ->letters()
+                ->numbers()
+                ->symbols()],
+        ]);
 
+        if ($checkPassword->fails()) {
+            return view('resetPassword')->withErrors([
+                'resetPassword' => $checkPassword->errors()->first(),
+            ]);
+        }
+
+        $student = Student::where('email', $passwordReset->email)->first();
+
+        if (!$student) {
+            $passwordReset->delete();
+            return view('resetPassword')->withErrors([
+                'resetPassword' => 'Link đã hết hạn',
+            ]);
+        }
+
+        $student->password = Hash::make($request->password);
         $student->save();
 
-        // delete current code
         $passwordReset->delete();
 
-        $data['success'] = true;
-        $data['message'] = 'Đã khôi phục mật khẩu thành công, bạn có thể đóng tab này và quay lại ứng dụng';
+        return view('resetPassword', [
+            'message' => 'Bạn đã khôi phục mật khẩu thành công'
+        ]);
 
-        return view('resetPassword', $data);
     }
+
+
 }

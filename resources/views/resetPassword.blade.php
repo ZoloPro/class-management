@@ -16,14 +16,14 @@
         <div class="card-body">
             <!-- Dòng chữ thông báo của bạn -->
             <div class="text-center p-2">
-                @if($success)
-                <img src="{{URL::asset('/image/success.png')}}" style="height: 7rem"/>
-                @else
+                @if($errors->first('resetPassword'))
                 <img src="{{URL::asset('/image/error.png')}}" style="height: 7rem"/>
+                @else
+                <img src="{{URL::asset('/image/success.png')}}" style="height: 7rem"/>
                 @endif
             </div>
             <h2 class="card-title text-center mt-2">Thông báo</h2>
-            <p class="text-center mt-1">{{$message}}</p>
+            <p class="text-center mt-1">{{$errors->first('resetPassword') ?: $message}}</p>
         </div>
     </div>
 </div>
