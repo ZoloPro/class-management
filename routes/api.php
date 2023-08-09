@@ -58,6 +58,11 @@ Route::prefix('/admin')->group(function () {
         Route::post('/wifi-info', [Api\WifiInfoController::class, 'store']);
         Route::delete('/wifi-info/{wifiInfoId}', [Api\WifiInfoController::class, 'destroy']);
         Route::put('/wifi-info/{wifiInfoId}', [Api\WifiInfoController::class, 'edit']);
+
+        Route::get('/departments', [Api\DepartmentController::class, 'index']);
+        Route::post('/departments', [Api\DepartmentController::class, 'store']);
+        Route::delete('/departments/{departmentId}', [Api\DepartmentController::class, 'delete']);
+        Route::put('/departments/{departmentId}', [Api\DepartmentController::class, 'update']);
     });
 });
 
@@ -73,7 +78,7 @@ Route::prefix('/student')->group(function () {
         Route::get('/classrooms', [Api\StudentController::class, 'getAllClassroomsByLoggedStudent']);
         Route::post('/detail', [Api\StudentController::class, 'getClassroomDetail']);
         Route::get('/grade', [Api\StudentController::class, 'getGradesByLoggedStudent']);
-        Route::post('/grade-list', [Api\StudentController::class, 'getGradesOfClassroom'])->middleware(EnsureInClassroom::class);
+        Route::post('/grade-list', [Api\GradeController::class, 'gradeList'])->middleware(EnsureInClassroom::class);
         Route::post('/password', [Api\StudentAuth::class, 'changePassword']);
         Route::post('/checkin', [Api\CheckinController::class, 'checkIn']);
         Route::get('/checkin-history', [Api\CheckinController::class, 'getCheckinHistoryByStudent']);

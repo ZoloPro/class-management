@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,6 +18,7 @@ class Student extends Authenticatable
     protected $primaryKey = 'id';
     protected $fillable = [
         'code',
+        'departmentId',
         'famMidName',
         'name',
         'gender',
@@ -77,5 +79,10 @@ class Student extends Authenticatable
     public function grades(): HasMany
     {
         return $this->hasMany(Grade::class, 'studentId');
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'departmentId');
     }
 }

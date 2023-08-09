@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Import\StudentsImport;
 use App\Models\Classroom;
+use App\Models\Department;
 use App\Models\Semester;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -18,16 +19,21 @@ class StudentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // All students
-        $studens = Student::all();
+        $departmentId = $request->query('department');
+
+        if ($departmentId != null) {
+            $students = Student::where('departmentId', $departmentId)->get();
+        } else {
+            $students = Student::all();
+        }
 
         // Return Json Response
         return response()->json([
             'success' => 1,
             'message' => 'Get data successfully',
-            'data' => ['students' => $studens]], 200);
+            'data' => ['students' => $students]], 200);
     }
 
     /**
@@ -393,24 +399,6 @@ class StudentController extends Controller
             'success' => 1,
             'message' => 'Get data successfully',
             'data' => array_values($semesterData->toArray())
-        ], 200);
-    }
-
-    public function getGradesOfClassroom(Request $request)
-    {
-        $classroomId = $request->classroomId;
-        $classroom = Classroom::find($classroomId);
-        $examGradeList = $classroom->hasGrades;
-        $examGradeList = $examGradeList->map(function ($grade) {
-            return $grade->grade->exam;
-        });
-
-        return response()->json([
-            'success' => 1,
-            'message' => 'Get data successfully',
-            'data' => [
-                'examGradeList' => $examGradeList
-            ]
         ], 200);
     }
 
