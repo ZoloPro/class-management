@@ -81,7 +81,7 @@ class GradeController extends Controller
         });
         //Loại bỏ những phần tử null
         $examGradeList = $examGradeList->filter(function ($item) {
-            return $item != null;
+            return $item !== null;
         });
         $totalAmountExam = $examGradeList->count();
         if ($totalAmountExam < 1) {
@@ -164,7 +164,7 @@ class GradeController extends Controller
         });
         //Loại bỏ những phần tử null
         $finalGradeList = $finalGradeList->filter(function ($item) {
-            return $item != null;
+            return $item !== null;
         });
         $totalAmountFinal = $finalGradeList->count();
         if ($totalAmountExam < 1) {

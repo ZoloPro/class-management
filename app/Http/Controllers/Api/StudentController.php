@@ -279,6 +279,7 @@ class StudentController extends Controller
                         'term' => $classroom->term,
 
                     ],
+                    'semester' => $classroom->semester->semesterName,
                     'grade' => $grade,
                     'studentList' => $students,
                     'documents' => $documents,
