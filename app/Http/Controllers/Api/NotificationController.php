@@ -51,7 +51,7 @@ class NotificationController extends Controller
         });
 
         return response()->json([
-            'status' => 1,
+            'success' => 1,
             'message' => 'success',
             'data' => $data,
         ], 200);
@@ -68,16 +68,15 @@ class NotificationController extends Controller
         $classroom = Classroom::find($request->classroomId);
 
         foreach ($classroom->students as $student) {
+            $notification = NotificationDetail::create([
+                'title' => $request->title,
+                'body' => $request->body,
+                'type' => $request->type,
+                'userId' => $student->id,
+                'status' => 0,
+                'time' => now(),
+            ]);
             if ($student->notifyToken) {
-                $notification = NotificationDetail::create([
-                    'title' => $request->title,
-                    'body' => $request->body,
-                    'type' => $request->type,
-                    'userId' => $student->id,
-                    'status' => 0,
-                    'time' => now(),
-                ]);
-
                 FCMService::send(
                     $student->notifyToken,
                     [
@@ -95,7 +94,7 @@ class NotificationController extends Controller
             }
         }
         return response()->json([
-            'status' => 1,
+            'success' => 1,
             'message' => 'success',
         ], 200);
     }
@@ -123,7 +122,7 @@ class NotificationController extends Controller
         $notification->status = 1;
         $notification->save();
         return response()->json([
-            'status' => 1,
+            'success' => 1,
             'message' => 'success',
             'data' => $notification->only(['id', 'title', 'body', 'type', 'status', 'time']),
         ], 200);
