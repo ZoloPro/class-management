@@ -128,4 +128,15 @@ class NotificationController extends Controller
         ], 200);
     }
 
+    public function countUnseenNotification(Request $request)
+    {
+        $student = Auth::user();
+        $count = NotificationDetail::where('userId', $student->id)->where('status', 0)->count();
+        return response()->json([
+            'success' => 1,
+            'message' => 'You have ' . $count . ' unseen notification',
+            'data' => $count,
+        ], 200);
+    }
+
 }

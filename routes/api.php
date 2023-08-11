@@ -87,7 +87,7 @@ Route::prefix('/student')->group(function () {
 
         Route::get('notification', [Api\NotificationController::class, 'getAllNotificationByStudent']);
         Route::post('/seen-notification', [Api\NotificationController::class, 'seenNotification']);
-
+        Route::get('/count-notification', [Api\NotificationController::class, 'countUnseenNotification']);
     });
 });
 
