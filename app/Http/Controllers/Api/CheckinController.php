@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Checkin;
 use App\Models\CheckinHistory;
 use App\Models\Classroom;
+use App\Models\NotificationDetail;
 use App\Models\WifiInfo;
+use App\Services\FCMService;
 use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -98,6 +100,31 @@ class CheckinController extends Controller
                 'date' => date('Y-m-d'),
             ]);
             $timeStr = date('d/m/Y H:i:s', strtotime($checkin->created_at));
+            $notifyTime = date('H:i d/m/Y', strtotime($checkin->created_at));
+            $notification = NotificationDetail::create([
+                'title' => $classroom->term->termName,
+                'body' => "Bạn đã điểm danh thành công lúc $notifyTime",
+                'type' => 1,
+                'userId' => $student->id,
+                'status' => 0,
+                'time' => now(),
+            ]);
+            if ($student->notifyToken) {
+                FCMService::send(
+                    $student->notifyToken,
+                    [
+                        'title' => $notification->title,
+                        'body' => $notification->body,
+                    ],
+                    [
+                        'id' => $notification->id . '',
+                        'type' => $notification->type . '',
+                        'idNotification' => '',
+                        'title' => $notification->title,
+                        'body' => $notification->body,
+                    ],
+                );
+            }
             return response()->json([
                 'success' => 1,
                 'message' => "Check in successfully class {$classroom->term->termName} at $timeStr",
