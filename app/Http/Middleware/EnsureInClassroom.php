@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class   EnsureInClassroom
+class EnsureInClassroom
 {
     /**
      * Handle an incoming request.

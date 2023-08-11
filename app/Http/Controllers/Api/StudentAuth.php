@@ -44,6 +44,11 @@ class StudentAuth extends Controller
             $user = Auth::user();
             $token = $user->createToken('API Token')->plainTextToken;
 
+            if ($request->notifyToken) {
+                $user->notifyToken = $request->notifyToken;
+                $user->save();
+            }
+
             return response()->json([
                 'success' => 1,
                 'message' => 'Logged in successfully',

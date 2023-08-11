@@ -85,11 +85,15 @@ Route::prefix('/student')->group(function () {
 
         Route::post('/active', [Api\StudentAuth::class, 'activeAccount']);
 
+        Route::get('notification', [Api\NotificationController::class, 'getAllNotificationByStudent']);
+        Route::post('/seen-notification', [Api\NotificationController::class, 'seenNotification']);
+
     });
 });
 
 Route::prefix('/lecturer')->group(function () {
     Route::post('/login', [Api\LecturerAuth::class, 'login']);
+    Route::post('/demo', [Api\StudentController::class, 'sendNotification']);
 
     Route::middleware('auth:lecturerToken')->group(function () {
         Route::get('/logout', [Api\LecturerAuth::class, 'logout']);
@@ -111,6 +115,8 @@ Route::prefix('/lecturer')->group(function () {
         Route::put('/grades/{classroomId}', [Api\GradeController::class, 'updateGrade'])->middleware(EnsureClassroomOwner::class);
 
         Route::get('/grades/{classroomId}/report', [Api\ReportController::class, 'index']);
+
+        Route::post('/send-notification/{classroomId}', [Api\NotificationController::class, 'sendNotifyToStudentsOfClass']);
     });
 });
 

@@ -26,11 +26,13 @@ class Student extends Authenticatable
         'phone',
         'email',
         'enrollmentDate',
-        'password'
+        'password',
+        'notifyToken',
     ];
 
     protected $hidden = [
-        'password'
+        'password',
+        'notifyToken',
     ];
 
     public function registeredClassrooms(): BelongsToMany

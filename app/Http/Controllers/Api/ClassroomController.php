@@ -186,7 +186,7 @@ class ClassroomController extends Controller
         $requestStudents = $request->students;
         foreach ($requestStudents as $requestStudent) {
             $student = Student::find($requestStudent);
-            $hasSampTerm = $student->registeredClassrooms()->where('termId', $classroom->termId)->exists();
+            $hasSampTerm = $student->registeredClassrooms()->where('termId', $classroom->termId)->where('classroomId', '!=', $id)->exists();
             if ($hasSampTerm) {
                 return response()->json([
                     'success' => 0,
@@ -195,7 +195,7 @@ class ClassroomController extends Controller
                 ], 400);
             }
         }
-        $classroom->registeredStudents()->sync($request->students);
+        $classroom->registeredStudents()->attach($request->students);
         $lecturer = $classroom->lecturer->only(['code', 'fullname']);
         $students = $classroom->registeredStudents()->get();
         $students = $students->map(function ($student) {

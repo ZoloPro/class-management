@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Import\StudentsImport;
-use App\Models\Classroom;
-use App\Models\Department;
 use App\Models\Semester;
 use App\Models\Student;
+use App\Services\FCMService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -58,7 +57,7 @@ class StudentController extends Controller
             // Return Json Response
             return response()->json([
                 'success' => 1,
-                'message' => "Lecturer successfully saved",
+                'message' => "Student successfully saved",
                 'data' => ['student' => $student]
             ], 201);
         } catch (\Exception $e) {
@@ -411,5 +410,4 @@ class StudentController extends Controller
         ];
         return response()->download($file, 'example-students.xlsx', $headers);
     }
-
 }

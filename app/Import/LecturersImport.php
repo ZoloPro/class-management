@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class LecturersImport implements ToCollection, WithHeadingRow
 {
@@ -22,7 +23,7 @@ class LecturersImport implements ToCollection, WithHeadingRow
                 'famMidName' => $row['Họ và lót'],
                 'name' => $row['Tên'],
                 'gender' => $row['Giới tính'],
-                'birthdate' => date("Y-m-d", strtotime($row['Ngày sinh'])),
+                'birthdate' => Date::excelToDateTimeObject($row['Ngày sinh']),
                 'email' => $row['Email'],
                 'phone' => $row['Điện thoại'],
             ]);

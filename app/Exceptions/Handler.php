@@ -38,11 +38,11 @@ class Handler extends ExceptionHandler
                 'success' => 0,
                 'message' => 'Entry for ' . str_replace('App\\', '', $exception->getModel()) . ' not found'], 404);
 
-        } else if ($exception->getCode() == 23000) {
+      /*  } else if ($exception->getCode() == 23000) {
             return response()->json([
                 'susscess' => 0,
                 'message' => 'Foreign Key Constraint Violation',
-                'errorCode' => 2300], 400);
+                'errorCode' => 2300], 400);*/
         } else if ($exception instanceof ValidationException) {
             $errorCollect = collect($exception->errors());
             return response()->json([
