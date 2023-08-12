@@ -22,17 +22,12 @@ class NotificationController extends Controller
         $notifications = NotificationDetail::where('user', 'student')->where('userId', $student->id)->orderByDesc('time')->get();
 
         $data = $notifications->map(function ($notificationDetail) {
-            if ($notificationDetail->notificationId) {
-                $notificationDetail->content = Notification::find($notificationDetail->notificationId)->content;
-            }
-
             return [
                 'id' => $notificationDetail->id . '',
                 'type_notification' => $notificationDetail->type . '',
                 'idNotification' => $notificationDetail->notificationId . '',
                 'title' => $notificationDetail->title . '',
                 'body' => $notificationDetail->body,
-                'content' => $notificationDetail->content . '',
                 'time' => $notificationDetail->time,
                 'status' => $notificationDetail->status . '',
             ];
@@ -99,21 +94,29 @@ class NotificationController extends Controller
                 'message' => $validator->errors()->first(),
             ], 200);
         }
-        $notification = NotificationDetail::find($request->id);
+        $notificationDetail = NotificationDetail::find($request->id);
 
-        if ($notification->userId != Auth::user()->id) {
+        if ($notificationDetail->userId != Auth::user()->id) {
             return response()->json([
                 'success' => 0,
                 'message' => 'You are not allowed to do this',
             ], 200);
         }
 
-        $notification->status = 1;
-        $notification->save();
+        $notificationDetail->status = 1;
+        $notificationDetail->save();
+
+        $notificationContent = '';
+
+        if ($notificationDetail->notificationId) {
+            $notification = Notification::find($notificationDetail->notificationId);
+            $notificationContent = $notification->content;
+        }
+
         return response()->json([
             'success' => 1,
             'message' => 'success',
-            'data' => $notification->only(['id', 'title', 'body', 'type', 'status', 'time']),
+            'data' => $notificationContent,
         ], 200);
     }
 
@@ -177,7 +180,6 @@ class NotificationController extends Controller
                         'idNotification' => $notification->id . '',
                         'title' => $request->title,
                         'body' => $request->body,
-                        'content' => $notification->content . '',
                     ],
                 );
             }
