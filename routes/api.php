@@ -63,6 +63,8 @@ Route::prefix('/admin')->group(function () {
         Route::post('/departments', [Api\DepartmentController::class, 'store']);
         Route::delete('/departments/{departmentId}', [Api\DepartmentController::class, 'delete']);
         Route::put('/departments/{departmentId}', [Api\DepartmentController::class, 'update']);
+
+        Route::post('/notifications', [Api\NotificationController::class, 'adminSendNotification']);
     });
 });
 

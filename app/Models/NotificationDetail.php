@@ -22,6 +22,7 @@ class NotificationDetail extends Model
         'body',
         'status',
         'time',
+        'user',
         'userId',
     ];
 

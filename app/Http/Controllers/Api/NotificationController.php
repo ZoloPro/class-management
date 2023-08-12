@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Classroom;
+use App\Models\Lecturer;
 use App\Models\Notification;
 use App\Models\NotificationDetail;
 use App\Models\Student;
@@ -14,39 +15,26 @@ use Illuminate\Support\Facades\Validator;
 
 class NotificationController extends Controller
 {
-    public function sendNotification(Request $request)
-    {
-        $student = Student::find($request->studentId);
-        FCMService::send(
-            $student->notiTokenn,
-            [
-                'title' => $request->title,
-                'body' => $request->body,
-
-            ],
-            [
-                'id' => $request->id,
-                'type' => $request->type,
-            ]
-        );
-
-    }
-
     public function getAllNotificationByStudent(Request $request)
     {
         $student = Auth::user();
 
-        $notifications = NotificationDetail::where('userId', $student->id)->orderByDesc('time')->get();
+        $notifications = NotificationDetail::where('user', 'student')->where('userId', $student->id)->orderByDesc('time')->get();
 
-        $data = $notifications->map(function ($notification) {
+        $data = $notifications->map(function ($notificationDetail) {
+            if ($notificationDetail->notificationId) {
+                $notificationDetail->content = Notification::find($notificationDetail->notificationId)->content;
+            }
+
             return [
-                'id' => $notification->id . '',
-                'type_notification' => $notification->type . '',
-                'idNotification' => $notification->notificationId . '',
-                'title' => $notification->title . '',
-                'body' => $notification->body,
-                'time' => $notification->time,
-                'status' => $notification->status . '',
+                'id' => $notificationDetail->id . '',
+                'type_notification' => $notificationDetail->type . '',
+                'idNotification' => $notificationDetail->notificationId . '',
+                'title' => $notificationDetail->title . '',
+                'body' => $notificationDetail->body,
+                'content' => $notificationDetail->content . '',
+                'time' => $notificationDetail->time,
+                'status' => $notificationDetail->status . '',
             ];
         });
 
@@ -72,6 +60,7 @@ class NotificationController extends Controller
                 'title' => $request->title,
                 'body' => $request->body,
                 'type' => $request->type,
+                'user' => 'student',
                 'userId' => $student->id,
                 'status' => 0,
                 'time' => now(),
@@ -131,11 +120,85 @@ class NotificationController extends Controller
     public function countUnseenNotification(Request $request)
     {
         $student = Auth::user();
-        $count = NotificationDetail::where('userId', $student->id)->where('status', 0)->count();
+        $count = NotificationDetail::where('user', 'student')->where('userId', $student->id)->where('status', 0)->count();
         return response()->json([
             'success' => 1,
             'message' => 'You have ' . $count . ' unseen notification',
             'data' => $count,
+        ], 200);
+    }
+
+    public function adminSendNotification(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'body' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => 0,
+                'message' => $validator->errors()->first(),
+            ], 200);
+        }
+
+        $notification = Notification::create([
+            'title' => $request->title,
+            'subtitle' => $request->body,
+            'content' => $request->notifyContent,
+            'type' => 3,
+            'time' => now(),
+        ]);
+
+        $students = Student::all();
+        $lecturers = Lecturer::all();
+
+        foreach ($students as $student) {
+            $notificationDetail = NotificationDetail::create([
+                'title' => $request->title,
+                'body' => $request->body,
+                'type' => 3,
+                'user' => 'student',
+                'userId' => $student->id,
+                'status' => 0,
+                'time' => now(),
+                'notificationId' => $notification->id,
+            ]);
+            if ($student->notifyToken) {
+                FCMService::send(
+                    $student->notifyToken,
+                    [
+                        'title' => $request->title,
+                        'body' => $request->body,
+                    ],
+                    [
+                        'id' => $notificationDetail->id . '',
+                        'type' => $notificationDetail->type . '',
+                        'idNotification' => $notification->id . '',
+                        'title' => $request->title,
+                        'body' => $request->body,
+                        'content' => $notification->content . '',
+                    ],
+                );
+            }
+        }
+
+        foreach ($lecturers as $lecturer) {
+            $notificationDetail = NotificationDetail::create([
+                'title' => $request->title,
+                'body' => $request->body,
+                'type' => 3,
+                'user' => 'lecturer',
+                'userId' => $lecturer->id,
+                'status' => 0,
+                'time' => now(),
+                'notificationId' => $notification->id,
+            ]);
+        }
+
+        return response()->json([
+            'success' => 1,
+            'message' => 'success',
         ], 200);
     }
 
