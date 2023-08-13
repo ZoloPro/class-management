@@ -20,8 +20,7 @@ class Classroom extends Model
     protected $fillable = [
         'termId',
         'lecturerId',
-        'startDate',
-        'endDate',
+        'semesterId',
     ];
 
     public function students(): BelongsToMany

@@ -13,17 +13,22 @@ class ClassroomController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // All classrooms
-        $classrooms = Classroom::all();
+        if ($request->query('semester')) {
+            $semesterId = $request->query('semester');
+            $classrooms = Classroom::where('semesterId', $semesterId)->get();
+
+        } else {
+            $classrooms = Classroom::all();
+        }
+
         $classrooms = $classrooms->map(function ($classroom) {
             return [
                 'id' => $classroom->id,
+                'semester' => $classroom->semester,
                 'term' => $classroom->term,
                 'lecturer' => $classroom->lecturer,
-                'startDate' => $classroom->startDate,
-                'endDate' => $classroom->endDate,
             ];
         });
         // Return Json Response
@@ -209,5 +214,20 @@ class ClassroomController extends Controller
                 'term' => $classroom->term,
                 'students' => $students
             ]]], 200);
+    }
+
+    function deleteStudentFromClass(Request $request)
+    {
+        $classroom = Classroom::find($request->classroomId);
+        $student = Student::find($request->studentId);
+        $classroom->registeredStudents()->detach($student);
+
+        return response()->json([
+            'success' => 1,
+            'message' => 'Delete student from class successfully',
+            'data' => []
+        ], 200);
+
+
     }
 }

@@ -11,6 +11,14 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class StudentsImport implements ToCollection, WithHeadingRow
 {
+
+    private $departmentId;
+
+    public function __construct($departmentId)
+    {
+        $this->departmentId = $departmentId;
+    }
+
     /**
      * @param array $row
      *
@@ -20,6 +28,7 @@ class StudentsImport implements ToCollection, WithHeadingRow
     {
         foreach ($rows as $row) {
             $student = Student::create([
+                'departmentId' => $this->departmentId,
                 'famMidName' => $row['Họ và lót'],
                 'name' => $row['Tên'],
                 'gender' => $row['Giới tính'],

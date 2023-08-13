@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Import\StudentsImport;
 use App\Models\Semester;
 use App\Models\Student;
-use App\Services\FCMService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
@@ -134,8 +134,23 @@ class StudentController extends Controller
     public function import(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), [
+                'departmentId' => 'required|exists:department,id',
+                'file' => 'required|file|mimes:xls,xlsx',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => 0,
+                    'message' => $validator->errors()->first(),
+                    'errorCode' => 400,
+                ], 400);
+            }
+
+            $departmentId = $request->departmentId;
+
             HeadingRowFormatter::default('none');
-            Excel::import(new StudentsImport(), $request->file);
+            Excel::import(new StudentsImport($departmentId), $request->file);
             return response()->json([
                 'success' => 1,
                 'message' => 'Data was imported successfully',

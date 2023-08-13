@@ -53,6 +53,7 @@ Route::prefix('/admin')->group(function () {
         Route::put('/classrooms/{id}', [Api\ClassroomController::class, 'update']);
         Route::get('/classrooms/{id}', [Api\ClassroomController::class, 'getStudentsByClassroom']);
         Route::put('/classrooms/{id}/student', [Api\ClassroomController::class, 'updateStudentListByClassroom']);
+        Route::delete('/classrooms/{classroomId}/student/{studentId}', [Api\ClassroomController::class, 'deleteStudentFromClass']);
 
         Route::get('/wifi-info', [Api\WifiInfoController::class, 'index']);
         Route::post('/wifi-info', [Api\WifiInfoController::class, 'store']);
@@ -63,6 +64,11 @@ Route::prefix('/admin')->group(function () {
         Route::post('/departments', [Api\DepartmentController::class, 'store']);
         Route::delete('/departments/{departmentId}', [Api\DepartmentController::class, 'delete']);
         Route::put('/departments/{departmentId}', [Api\DepartmentController::class, 'update']);
+
+        Route::get('semesters', [Api\SemesterController::class, 'index']);
+        Route::post('semesters', [Api\SemesterController::class, 'store']);
+        Route::delete('semesters/{semesterId}', [Api\SemesterController::class, 'destroy']);
+        Route::put('semesters/{semesterId}', [Api\SemesterController::class, 'update']);
 
         Route::post('/notifications', [Api\NotificationController::class, 'adminSendNotification']);
     });
@@ -121,9 +127,6 @@ Route::prefix('/lecturer')->group(function () {
         Route::post('/send-notification/{classroomId}', [Api\NotificationController::class, 'sendNotifyToStudentsOfClass']);
     });
 });
-
-//
-//Route::post('/attendance', [Api\CheckinController::class, 'attend']);
 
 Route::fallback(function () {
     return response()->json([
